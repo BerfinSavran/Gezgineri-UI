@@ -1,5 +1,6 @@
 import axios from "axios";
 import { Traveler } from "../types";
+import axiosInstance from "../context/axiosInstance";
 
 const baseUrl = "https://localhost:7033/api/Traveler";
 
@@ -16,7 +17,7 @@ class TravelerService{
 
     public async GetTravelerByMemberId(id: string): Promise<any> {
         try {
-            const response = await axios.get(`${baseUrl}/memberid/${id}`);
+            const response = await axiosInstance.get(`${baseUrl}/memberid/${id}`);
             return response.data;
         } catch (error) {
             console.error("Error getting traveler: ", error);

@@ -1,5 +1,6 @@
 import axios from "axios";
 import { Agency } from "../types";
+import axiosInstance from "../context/axiosInstance";
 
 const baseUrl = "https://localhost:7033/api/Agency";
 
@@ -16,7 +17,7 @@ class AgencyService {
 
     public async GetAgencyByMemberId(id: string){
         try{
-            const response = await axios.get(`${baseUrl}/memberid/${id}`);
+            const response = await axiosInstance.get(`${baseUrl}/memberid/${id}`);
             return response.data;
         } catch (error) {
             console.error("Error getting agency: ", error);

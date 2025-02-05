@@ -1,5 +1,6 @@
 import axios from "axios";
 import { Owner } from "../types";
+import axiosInstance from "../context/axiosInstance";
 
 const baseUrl = "https://localhost:7033/api/Owner";
 
@@ -16,7 +17,7 @@ class OwnerService{
 
     public async GetOwnerByMemberId(id: string){
         try{
-            const response = await axios.get(`${baseUrl}/memberid/${id}`);
+            const response = await axiosInstance.get(`${baseUrl}/memberid/${id}`);
             return response.data;
         } catch (error) {
             console.error("Error getting owner: ", error);
