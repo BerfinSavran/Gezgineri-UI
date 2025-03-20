@@ -10,6 +10,10 @@ import MyTravelPage from './pages/myTravel';
 import TravelPage from './pages/travel';
 import TourPage from './pages/tour';
 import { AuthProvider } from './context/authContext';
+import AddPlacePage from './pages/addPlace';
+import ApprovalPlacesPage from './pages/approvalPlaces';
+import AddTourPage from './pages/addTour';
+import TourDetailsPage from './pages/tourDetails';
 
 
 function App() {
@@ -35,11 +39,15 @@ function AppContent() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/home" element={<HomePage />} /> 
         <Route path="/profile" element={<ProfilePage/>} />
-        <Route path="/place" element={<PlacePage/>}/>
+        <Route path="/place/:id" element={<PlacePage/>}/>
         <Route path="/tours" element={<ToursPage/>}/>
-        <Route path="/tour" element={<TourPage/>}/>
+        <Route path="/tour/id/:id" element={<TourPage/>}/>
         <Route path="/myTravel" element={<MyTravelPage/>}/>
-        <Route path="/travel" element={<TravelPage/>}/>
+        <Route path="/travel/:id" element={<TravelPage/>}/>
+        <Route path='/addPlace' element={<AddPlacePage/>}/>
+        <Route path='/addTour' element={<AddTourPage/>}/>
+        <Route path="/tourDetails/:id" element={<TourDetailsPage/>}/>
+        <Route path='/approvalPlaces' element={<ApprovalPlacesPage/>}/>
 
       </Routes>
     </div>

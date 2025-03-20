@@ -6,8 +6,9 @@ import { useAuth } from '../context/authContext';
 import { EnumRole } from '../types';
 
 export default function NavBar() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
+
   const [accountMenuAnchor, setAccountMenuAnchor] = useState<null | HTMLElement>(null);
   const [dropdownMenuAnchor, setDropdownMenuAnchor] = useState<null | HTMLElement>(null);
 
@@ -29,6 +30,11 @@ export default function NavBar() {
   const handleNavigation = (path: string) => {
     navigate(path);
     handleClose();
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
   };
 
   const getMenuItems = () => {
@@ -103,7 +109,7 @@ export default function NavBar() {
             onClose={handleClose}
           >
             <MenuItem onClick={() => handleNavigation('/profile')}>Hesabım</MenuItem>
-            <MenuItem onClick={() => handleNavigation('/')}>Çıkış</MenuItem>
+            <MenuItem onClick={handleLogout}>Çıkış</MenuItem>
           </Menu>
         </Box>
       </Toolbar>
