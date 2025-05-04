@@ -1,4 +1,4 @@
-import axios from "axios";
+import axiosInstance from "../context/axiosInstance";
 import { TourRoute } from "../types";
 
 const baseUrl = "https://localhost:7033/api/TourRoute";
@@ -6,7 +6,7 @@ const baseUrl = "https://localhost:7033/api/TourRoute";
 class TourRouteService {
     public async AddOrUpdateTourRoute(tourRoute: Partial<TourRoute>) {
         try {
-            const response = await axios.post(baseUrl, tourRoute);
+            const response = await axiosInstance.post(baseUrl, tourRoute);
             return response.data;
         } catch (error) {
             console.error("Error creating or updating tour route:", error);
@@ -16,7 +16,7 @@ class TourRouteService {
 
     public async GetAllTourRoutes(): Promise<TourRoute[]> {
         try {
-            const response = await axios.get(baseUrl);
+            const response = await axiosInstance.get(baseUrl);
             return response.data;
         } catch (error) {
             console.error("Error getting tour routes:", error);
@@ -26,7 +26,7 @@ class TourRouteService {
 
     public async GetTourRouteById(id: string): Promise<TourRoute> {
         try {
-            const response = await axios.get(`${baseUrl}/id/${id}`);
+            const response = await axiosInstance.get(`${baseUrl}/id/${id}`);
             return response.data;
         } catch (error) {
             console.error("Error getting tour route:", error);
@@ -36,7 +36,7 @@ class TourRouteService {
 
     public async DeleteTourRoute(id: string) {
         try {
-            const response = await axios.delete(`${baseUrl}?id=${id}`);
+            const response = await axiosInstance.delete(`${baseUrl}?id=${id}`);
             return response.data;
         } catch (error) {
             console.error("Error deleting tour route:", error);
@@ -46,7 +46,7 @@ class TourRouteService {
 
     public async GetTourRoutesByTourId(tourid: string): Promise<TourRoute[]> {
         try {
-            const response = await axios.get(`${baseUrl}/tourid/${tourid}`);
+            const response = await axiosInstance.get(`${baseUrl}/tourid/${tourid}`);
             return response.data;
         } catch (error) {
             console.error("Error getting tour route:", error);

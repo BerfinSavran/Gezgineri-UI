@@ -1,5 +1,5 @@
-import axios from "axios";
 import { Category } from "../types";
+import axiosInstance from "../context/axiosInstance";
 
 const baseUrl = "https://localhost:7033/api/Category";
 
@@ -7,7 +7,7 @@ class CategoryService {
     // Kategori Ekle veya Güncelle
     public async AddOrUpdateCategory(category: Partial<Category>) {
         try {
-            const response = await axios.post(baseUrl, category);
+            const response = await axiosInstance.post(baseUrl, category);
             return response.data;
         } catch (error) {
             console.error("Kategori eklenirken/güncellenirken hata oluştu:", error);
@@ -18,7 +18,7 @@ class CategoryService {
     // Kategori Sil
     public async DeleteCategory(id: string) {
         try {
-            const response = await axios.delete(`${baseUrl}?id=${id}`);
+            const response = await axiosInstance.delete(`${baseUrl}?id=${id}`);
             return response.data;
         } catch (error) {
             console.error("Kategori silinirken hata oluştu:", error);
@@ -29,7 +29,7 @@ class CategoryService {
     // Tüm Kategorileri Getir
     public async GetAllCategories() {
         try {
-            const response = await axios.get(baseUrl);
+            const response = await axiosInstance.get(baseUrl);
             return response.data;
         } catch (error) {
             console.error("Kategoriler getirilirken hata oluştu:", error);
@@ -40,7 +40,7 @@ class CategoryService {
     // ID ile Kategori Getir
     public async GetCategoryById(id: string) {
         try {
-            const response = await axios.get(`${baseUrl}/id/${id}`);
+            const response = await axiosInstance.get(`${baseUrl}/id/${id}`);
             return response.data;
         } catch (error) {
             console.error("Kategori getirilirken hata oluştu:", error);

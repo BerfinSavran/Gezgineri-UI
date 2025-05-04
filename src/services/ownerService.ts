@@ -1,4 +1,3 @@
-import axios from "axios";
 import { Owner } from "../types";
 import axiosInstance from "../context/axiosInstance";
 
@@ -7,13 +6,23 @@ const baseUrl = "https://localhost:7033/api/Owner";
 class OwnerService{
     public async CreateOwner(owner: Partial<Owner>){
         try {
-            const response = await axios.post(baseUrl, owner);
+            const response = await axiosInstance.post(baseUrl, owner);
             return response.data;
         } catch (error) {
             console.error("Error creating owner: ", error);
             throw error;
         }
     }
+
+    public async GetAllOwners(): Promise<any> {
+            try {
+                const response = await axiosInstance.get(baseUrl);
+                return response.data;
+            } catch (error) {
+                console.error("Error getting owners: ", error);
+                throw error;
+            }
+        }
 
     public async GetOwnerByMemberId(id: string){
         try{
@@ -27,7 +36,7 @@ class OwnerService{
 
     public async UpdateOwner(owner: Partial<Owner>){
         try {
-            const response = await axios.put(baseUrl, owner);
+            const response = await axiosInstance.put(baseUrl, owner);
             return response.data;
         }  catch (error) {
             console.error("Error getting traveler: ", error);

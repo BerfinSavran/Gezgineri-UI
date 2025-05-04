@@ -6,6 +6,15 @@ export interface Member {
     role: EnumRole;
 }
 
+export interface Admin {
+  id: string;
+    memberId: string;
+    fullName: string;
+    email: string;
+    password: string;
+    role: EnumRole;
+}
+
 export interface Traveler {
     id: string;
     memberId: string;
@@ -93,6 +102,7 @@ export interface Traveler {
     startDate: string;
     endDate: string;
     imageUrl?: string;
+    webSiteUrl: string,
     status: EnumStatus;
     approvedById: string;
   }

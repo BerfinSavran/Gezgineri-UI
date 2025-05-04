@@ -18,7 +18,8 @@ export default function ToursPage() {
     const fetchTours = async () => {
         try {
             const data = await tourService.GetToursStartingFromToday();
-            setTours(data);
+            const approvedTours = data.filter((tour: Tour) => tour.status === 1);
+            setTours(approvedTours);
         } catch (error) {
             console.error("Error fetching tours:", error);
             alert("Error fetching tours.");
@@ -45,9 +46,13 @@ export default function ToursPage() {
                             key={tour.id}
                             sx={{
                                 width: "100%",
-                                height: "200px",
+                                height: "auto", // Kartın minimum yüksekliğini ayarlayalım
                                 border: "1px solid",
-                                padding: 2
+                                padding: 2,
+                                display: 'flex',
+                                flexDirection: 'column',
+                                justifyContent: 'space-between', // İçeriği alt ve üst arasında paylaştırır
+                                overflow: 'hidden',
                             }}
                             onClick={() => handleTourClick(tour.id)}
                         >
@@ -62,7 +67,15 @@ export default function ToursPage() {
                                     display: "flex",
 
                                 }}>
-                                    Fotoğraf
+                                    {tour.imageUrl ? (
+                                        <img
+                                            src={tour.imageUrl}
+                                            alt={tour.name}
+                                            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                                        />
+                                    ) : (
+                                        "Fotoğraf"
+                                    )}
                                 </Card>
                                 <Stack direction={"column"} spacing={"8px"}>
                                     <Typography variant="h6">Turun İsmi: {tour.name}</Typography>

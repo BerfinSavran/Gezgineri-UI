@@ -1,12 +1,12 @@
-import axios from "axios";
 import { Place } from "../types";
+import axiosInstance from "../context/axiosInstance";
 
 const baseUrl = "https://localhost:7033/api/Place";
 
 class PlaceService {
     public async AddOrUpdatePlace(place: Partial<Place>) {
         try {
-            const response = await axios.post(baseUrl, place);
+            const response = await axiosInstance.post(baseUrl, place);
             return response.data;
         } catch (error) {
             console.error("Error creating or updating place:", error);
@@ -16,7 +16,7 @@ class PlaceService {
 
     public async GetAllPlaces(): Promise<Place[]> {
         try {
-            const response = await axios.get(baseUrl);
+            const response = await axiosInstance.get(baseUrl);
             return response.data;
         } catch (error) {
             console.error("Error getting places:", error);
@@ -26,7 +26,7 @@ class PlaceService {
 
     public async GetPlaceById(id: string): Promise<Place> {
         try {
-            const response = await axios.get(`${baseUrl}/id/${id}`);
+            const response = await axiosInstance.get(`${baseUrl}/id/${id}`);
             return response.data;
         } catch (error) {
             console.error("Error getting place:", error);
@@ -36,7 +36,7 @@ class PlaceService {
 
     public async DeletePlace(id: string) {
         try {
-            const response = await axios.delete(`${baseUrl}?id=${id}`);
+            const response = await axiosInstance.delete(`${baseUrl}?id=${id}`);
             return response.data;
         } catch (error) {
             console.error("Error deleting place:", error);
@@ -46,7 +46,7 @@ class PlaceService {
 
     public async GetPlacesByOwnerIdWithInclude(id: string) {
         try {
-            const response = await axios.get(`${baseUrl}/ownerid`, {
+            const response = await axiosInstance.get(`${baseUrl}/ownerid`, {
                 params: { ownerid: id }
             });
             return response.data;
@@ -63,7 +63,7 @@ class PlaceService {
                 ? `${baseUrl}/location/${country}?city=${city}`
                 : `${baseUrl}/location/${country}`;
             
-            const response = await axios.get(url);
+            const response = await axiosInstance.get(url);
             return response.data;
         } catch (error) {
             console.error("Error getting places:", error);

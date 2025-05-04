@@ -1,4 +1,4 @@
-import axios from "axios";
+import axiosInstance from "../context/axiosInstance";
 import { MyTravelPlan } from "../types";  // MyTravelPlan tipi kullandığınızı varsayıyorum
 
 const baseUrl = "https://localhost:7033/api/MyTravelPlan";  // API'nin doğru URL'si
@@ -7,7 +7,7 @@ class MyTravelPlanService {
     // Add or Update Travel Plan
     public async AddOrUpdateTravelPlan(travelPlan: MyTravelPlan) {
         try {
-            const response = await axios.post(baseUrl, travelPlan);
+            const response = await axiosInstance.post(baseUrl, travelPlan);
             return response.data;
         } catch (error) {
             console.error("Error creating or updating travel plan:", error);
@@ -18,7 +18,7 @@ class MyTravelPlanService {
     // Get all travel plans
     public async GetAllTravelPlans(): Promise<MyTravelPlan[]> {
         try {
-            const response = await axios.get(baseUrl);
+            const response = await axiosInstance.get(baseUrl);
             return response.data;
         } catch (error) {
             console.error("Error getting travel plans:", error);
@@ -29,7 +29,7 @@ class MyTravelPlanService {
     // Get a specific travel plan by ID
     public async GetTravelPlanById(id: string): Promise<MyTravelPlan> {
         try {
-            const response = await axios.get(`${baseUrl}/id/${id}`);
+            const response = await axiosInstance.get(`${baseUrl}/id/${id}`);
             return response.data;
         } catch (error) {
             console.error("Error getting travel plan by id:", error);
@@ -39,7 +39,7 @@ class MyTravelPlanService {
 
     public async GetTravelPlansByTravelId(travelId: string): Promise<MyTravelPlan[]> {
         try {
-            const response = await axios.get(`${baseUrl}/travelId/${travelId}`);
+            const response = await axiosInstance.get(`${baseUrl}/travelId/${travelId}`);
             return response.data;
         } catch (error) {
             console.error("Error getting travel plan by id:", error);
@@ -50,7 +50,7 @@ class MyTravelPlanService {
     // Delete a specific travel plan by ID
     public async DeleteTravelPlan(id: string) {
         try {
-            const response = await axios.delete(`${baseUrl}?id=${id}`);
+            const response = await axiosInstance.delete(`${baseUrl}?id=${id}`);
             return response.data;
         } catch (error) {
             console.error("Error deleting travel plan:", error);

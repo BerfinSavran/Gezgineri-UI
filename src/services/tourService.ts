@@ -1,4 +1,4 @@
-import axios from "axios";
+import axiosInstance from "../context/axiosInstance";
 import { Tour } from "../types";
 
 const baseUrl = "https://localhost:7033/api/Tour";
@@ -6,7 +6,7 @@ const baseUrl = "https://localhost:7033/api/Tour";
 class TourService {
     public async AddOrUpdateTour(tour: Partial<Tour>) {
         try {
-            const response = await axios.post(baseUrl, tour);
+            const response = await axiosInstance.post(baseUrl, tour);
             return response.data;
         } catch (error) {
             console.error("Error creating or updating tour:", error);
@@ -16,7 +16,7 @@ class TourService {
 
     public async GetAllWithInclude(): Promise<Tour[]> {
         try {
-            const response = await axios.get(baseUrl);
+            const response = await axiosInstance.get(baseUrl);
             return response.data;
         } catch (error) {
             console.error("Error getting tours:", error);
@@ -26,7 +26,7 @@ class TourService {
 
     public async GetTourByIdWithInclude(id: string): Promise<Tour> {
         try {
-            const response = await axios.get(`${baseUrl}/id/${id}`);
+            const response = await axiosInstance.get(`${baseUrl}/id/${id}`);
             return response.data;
         } catch (error) {
             console.error("Error getting tour:", error);
@@ -36,7 +36,7 @@ class TourService {
 
     public async DeleteTour(id: string) {
         try {
-            const response = await axios.delete(`${baseUrl}?id=${id}`);
+            const response = await axiosInstance.delete(`${baseUrl}?id=${id}`);
             return response.data;
         } catch (error) {
             console.error("Error deleting tour:", error);
@@ -46,7 +46,7 @@ class TourService {
 
     public async GetToursByAgencyIdWithInclude(id: string) {
         try {
-            const response = await axios.get(`${baseUrl}/agencyid`, {
+            const response = await axiosInstance.get(`${baseUrl}/agencyid`, {
                 params: { agencyid: id }
             });
             return response.data;
@@ -58,7 +58,7 @@ class TourService {
 
     public async GetToursStartingFromToday(): Promise<Tour[]> {
         try {
-            const response = await axios.get(`${baseUrl}/GetToursStartingFromToday`);
+            const response = await axiosInstance.get(`${baseUrl}/GetToursStartingFromToday`);
             return response.data;
         } catch (error) {
             console.error("Error getting tours:", error);

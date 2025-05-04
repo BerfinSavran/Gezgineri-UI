@@ -27,7 +27,7 @@ export default function PlacePage() {
                 if (data.categoryId) {
                     // Veritabanından kategori bilgisini alabiliriz
                     const categoryData = await categoryService.GetAllCategories();
-                    setCategories(categoryData); 
+                    setCategories(categoryData);
                 }
             }
         } catch (error) {
@@ -90,6 +90,8 @@ export default function PlacePage() {
             description: editedPlace.description || place?.description,
             country: editedPlace.country || place?.country,
             city: editedPlace.city || place?.city,
+            imageUrl: editedPlace.imageUrl || place?.imageUrl,
+            status: place?.status,
         };
 
         try {
@@ -140,8 +142,8 @@ export default function PlacePage() {
     };
 
     const handleCategoryChange = (event: SelectChangeEvent<string>) => {
-            setPlace((prev) => ({ ...prev, categoryId: event.target.value }));
-        };
+        setPlace((prev) => ({ ...prev, categoryId: event.target.value }));
+    };
 
     return (
         <Container maxWidth="xl">
@@ -195,8 +197,18 @@ export default function PlacePage() {
                             fontSize: "18px",
                             color: "gray"
                         }}>
-                            {place.imageUrl ? (
-                                <img src={place.imageUrl} alt={place.name} style={{ width: "100%", height: "100%" }} />
+                            {isEditing && editedPlace.imageUrl ? (
+                                <img
+                                    src={editedPlace.imageUrl}
+                                    alt={place.name}
+                                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                                />
+                            ) : place.imageUrl ? (
+                                <img
+                                    src={place.imageUrl}
+                                    alt={place.name}
+                                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                                />
                             ) : "Fotoğraf"}
                         </Card>
                         <Typography variant="body1" sx={{ mt: "20px" }}>Lokasyon: {place.country + ", " + place.city}</Typography>
@@ -212,118 +224,145 @@ export default function PlacePage() {
                         flexDirection: "column",
                         gap: "10px"
                     }}>
-                        {isEditing ? (
-                            <>
-                                <TextField
-                                    label="Mekan Adı"
-                                    variant="outlined"
-                                    size="small"
-                                    fullWidth
-                                    name="name"
-                                    value={editedPlace.name ?? place.name ?? ""}
-                                    onChange={handleInputChange}
-                                    sx={{ mb: 1 }}
-                                />
-                                <TextField
-                                    label="Gezi Süresi"
-                                    variant="outlined"
-                                    size="small"
-                                    fullWidth
-                                    name="visitDuration"
-                                    value={editedPlace.visitDuration ?? place.visitDuration ?? ""}
-                                    onChange={handleInputChange}
-                                    sx={{ mb: 1 }}
-                                />
-                                <Select
-                                    labelId="category-label"
-                                    label="Kategorisi"
-                                    name="categoryId"
-                                    value={editedPlace.categoryId ?? place.categoryId ?? ""}
-                                    onChange={handleCategoryChange}
-                                    displayEmpty
-                                >
-                                    {categories.map((category) => (
-                                        <MenuItem key={category.id} value={category.id}>
-                                            {category.name}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                                <TextField
-                                    label="Giriş Ücreti"
-                                    variant="outlined"
-                                    size="small"
-                                    fullWidth
-                                    name="entryPrice"
-                                    value={editedPlace.entryPrice ?? place.entryPrice ?? ""}
-                                    onChange={handleInputChange}
-                                    sx={{ mb: 1 }}
-                                />
-                                <TextField
-                                    label="Kapasitesi"
-                                    variant="outlined"
-                                    size="small"
-                                    fullWidth
-                                    name="capacity"
-                                    value={editedPlace.capacity ?? place.capacity ?? ""}
-                                    onChange={handleInputChange}
-                                    sx={{ mb: 1 }}
-                                />
-                                <TextField
-                                    label="Lokasyon"
-                                    variant="outlined"
-                                    size="small"
-                                    fullWidth
-                                    name="country"
-                                    value={editedPlace.country ?? place.country ?? ""}
-                                    onChange={handleInputChange}
-                                    sx={{ mb: 1 }}
-                                />
-                                <TextField
-                                    label="Şehir"
-                                    variant="outlined"
-                                    size="small"
-                                    fullWidth
-                                    name="city"
-                                    value={editedPlace.city ?? place.city ?? ""}
-                                    onChange={handleInputChange}
-                                    sx={{ mb: 1 }}
-                                />
-                                <TextareaAutosize
-                                    minRows={3}
-                                    placeholder="Açıklama"
-                                    name="description"
-                                    value={editedPlace.description ?? place.description ?? ""}
-                                    onChange={handleInputChange}
-                                    style={{ width: "100%", marginBottom: "8px" }} />
-                            </>
-                        ) : (
-                            <>
-                                <Stack direction="row" justifyContent="space-between">
-                                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>İşletmenin Adı:</Typography>
-                                    <Typography variant="body1">{place.businessName}</Typography>
-                                </Stack>
-                                <Stack direction="row" justifyContent="space-between">
-                                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>Gezi Süresi: </Typography>
-                                    <Typography variant="body1">{place.visitDuration}</Typography>
-                                </Stack>
-                                <Stack direction="row" justifyContent="space-between">
-                                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>Kategorisi:</Typography>
-                                    <Typography variant="body1">{place.categoryName}</Typography>
-                                </Stack>
-                                <Stack direction="row" justifyContent="space-between">
-                                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>Giriş Ücreti:</Typography>
-                                    <Typography variant="body1">{place.entryPrice}</Typography>
-                                </Stack>
-                                <Stack direction="row" justifyContent="space-between">
-                                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>Kapasitesi:</Typography>
-                                    <Typography variant="body1">{place.capacity}</Typography>
-                                </Stack>
-                                <Stack direction="row" justifyContent="space-between">
-                                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>Açıklama:</Typography>
-                                    <Typography variant="body1">{place.description}</Typography>
-                                </Stack>
-                            </>
-                        )}
+                        <Box sx={{
+                            overflowY: "auto",
+                            flex: 1,
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: "10px",
+                            pr: 1,
+                            pb: 2,
+                        }}>
+                            {isEditing ? (
+                                <>
+                                    <TextField
+                                        label="Mekan Adı"
+                                        variant="outlined"
+                                        size="small"
+                                        fullWidth
+                                        name="name"
+                                        value={editedPlace.name ?? place.name ?? ""}
+                                        onChange={handleInputChange}
+                                        sx={{ mb: 1 }}
+                                    />
+                                    <TextField
+                                        label="Gezi Süresi"
+                                        variant="outlined"
+                                        size="small"
+                                        fullWidth
+                                        name="visitDuration"
+                                        value={editedPlace.visitDuration ?? place.visitDuration ?? ""}
+                                        onChange={handleInputChange}
+                                        sx={{ mb: 1 }}
+                                    />
+                                    <Select
+                                        labelId="category-label"
+                                        label="Kategorisi"
+                                        name="categoryId"
+                                        value={editedPlace.categoryId ?? place.categoryId ?? ""}
+                                        onChange={handleCategoryChange}
+                                        displayEmpty
+                                    >
+                                        {categories.map((category) => (
+                                            <MenuItem key={category.id} value={category.id}>
+                                                {category.name}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                    <TextField
+                                        label="Giriş Ücreti"
+                                        variant="outlined"
+                                        size="small"
+                                        fullWidth
+                                        name="entryPrice"
+                                        value={editedPlace.entryPrice ?? place.entryPrice ?? ""}
+                                        onChange={handleInputChange}
+                                        sx={{ mb: 1 }}
+                                    />
+                                    <TextField
+                                        label="Kapasitesi"
+                                        variant="outlined"
+                                        size="small"
+                                        fullWidth
+                                        name="capacity"
+                                        value={editedPlace.capacity ?? place.capacity ?? ""}
+                                        onChange={handleInputChange}
+                                        sx={{ mb: 1 }}
+                                    />
+                                    <TextField
+                                        label="Lokasyon"
+                                        variant="outlined"
+                                        size="small"
+                                        fullWidth
+                                        name="country"
+                                        value={editedPlace.country ?? place.country ?? ""}
+                                        onChange={handleInputChange}
+                                        sx={{ mb: 1 }}
+                                    />
+                                    <TextField
+                                        label="Şehir"
+                                        variant="outlined"
+                                        size="small"
+                                        fullWidth
+                                        name="city"
+                                        value={editedPlace.city ?? place.city ?? ""}
+                                        onChange={handleInputChange}
+                                        sx={{ mb: 1 }}
+                                    />
+                                    <TextareaAutosize
+                                        minRows={3}
+                                        placeholder="Açıklama"
+                                        name="description"
+                                        value={editedPlace.description ?? place.description ?? ""}
+                                        onChange={handleInputChange}
+                                        style={{
+                                            width: "100%",
+                                            marginBottom: "8px",
+                                            boxSizing: "border-box",
+                                            resize: "vertical",
+                                            minHeight: "60px"
+                                        }} />
+                                    <TextField
+                                        label="Fotoğraf URL"
+                                        variant="outlined"
+                                        size="small"
+                                        fullWidth
+                                        name="imageUrl"
+                                        value={editedPlace.imageUrl ?? place.imageUrl ?? ""}
+                                        onChange={handleInputChange}
+                                        sx={{ mb: 1 }}
+                                    />
+
+                                </>
+                            ) : (
+                                <>
+                                    <Stack direction="row" justifyContent="space-between">
+                                        <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>İşletmenin Adı:</Typography>
+                                        <Typography variant="body1">{place.businessName}</Typography>
+                                    </Stack>
+                                    <Stack direction="row" justifyContent="space-between">
+                                        <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>Gezi Süresi: </Typography>
+                                        <Typography variant="body1">{place.visitDuration}</Typography>
+                                    </Stack>
+                                    <Stack direction="row" justifyContent="space-between">
+                                        <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>Kategorisi:</Typography>
+                                        <Typography variant="body1">{place.categoryName}</Typography>
+                                    </Stack>
+                                    <Stack direction="row" justifyContent="space-between">
+                                        <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>Giriş Ücreti:</Typography>
+                                        <Typography variant="body1">{place.entryPrice}</Typography>
+                                    </Stack>
+                                    <Stack direction="row" justifyContent="space-between">
+                                        <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>Kapasitesi:</Typography>
+                                        <Typography variant="body1">{place.capacity}</Typography>
+                                    </Stack>
+                                    <Stack direction="row" justifyContent="space-between">
+                                        <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>Açıklama:</Typography>
+                                        <Typography variant="body1">{place.description}</Typography>
+                                    </Stack>
+                                </>
+                            )}
+                        </Box>
                     </Card>
 
                 </Stack>

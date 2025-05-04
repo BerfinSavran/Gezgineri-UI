@@ -1,5 +1,5 @@
-import axios from "axios";
 import { FavoritePlace } from "../types";
+import axiosInstance from "../context/axiosInstance";
 
 const baseUrl = "https://localhost:7033/api/FavoritePlace";
 
@@ -7,7 +7,7 @@ class FavoritePlaceService {
 
     async CheckFavorite(travelerid: string, placeid: string) {
         try {
-            const response = await axios.get(`${baseUrl}/CheckFavorite?travelerid=${travelerid}&placeid=${placeid}`);
+            const response = await axiosInstance.get(`${baseUrl}/CheckFavorite?travelerid=${travelerid}&placeid=${placeid}`);
             return response.data;
         } catch (error) {
             console.error("CheckFavorite error:", error);
@@ -17,7 +17,7 @@ class FavoritePlaceService {
 
     async AddOrUpdateFavoritePlace(favoritePlace: Partial<FavoritePlace>) {
         try {
-            const response = await axios.post(`${baseUrl}`, favoritePlace);
+            const response = await axiosInstance.post(`${baseUrl}`, favoritePlace);
             return response.data;
         } catch (error) {
             console.error("AddOrUpdateFavoritePlace error:", error);
@@ -27,7 +27,7 @@ class FavoritePlaceService {
 
     async DeleteFavoritePlace(id: string) {
         try {
-            const response = await axios.delete(`${baseUrl}?id=${id}`);
+            const response = await axiosInstance.delete(`${baseUrl}?id=${id}`);
             return response.data;
         } catch (error) {
             console.error("DeleteFavoritePlace error:", error);
@@ -37,7 +37,7 @@ class FavoritePlaceService {
 
     async GetAllFavoritePlaces() {
         try {
-            const response = await axios.get(`${baseUrl}`);
+            const response = await axiosInstance.get(`${baseUrl}`);
             return response.data;
         } catch (error) {
             console.error("GetAllFavoritePlaces error:", error);
@@ -47,7 +47,7 @@ class FavoritePlaceService {
 
     async GetFavoritePlaceById(id: string) {
         try {
-            const response = await axios.get(`${baseUrl}/id/${id}`);
+            const response = await axiosInstance.get(`${baseUrl}/id/${id}`);
             return response.data;
         } catch (error) {
             console.error("GetFavoritePlaceById error:", error);

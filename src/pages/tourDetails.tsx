@@ -24,7 +24,12 @@ export default function TourDetailsPage() {
         try {
             if (id) {
                 const data = await tourRouteService.GetTourRoutesByTourId(id);
-                setRoutes(data);
+                const sortedRoutes = data.sort((a, b) => {
+                    const dateA = new Date(a.date);
+                    const dateB = new Date(b.date);
+                    return dateA.getTime() - dateB.getTime();
+                });
+                setRoutes(sortedRoutes);
             }
         } catch (error) {
             console.error("Error fetching tour routes:", error);

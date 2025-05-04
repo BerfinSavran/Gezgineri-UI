@@ -3,27 +3,41 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import authService from "../services/authService";
 import { useAuth } from "../context/authContext";
+import { EnumRole } from "../types";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { setToken } = useAuth();  // token'ı set eden fonksiyonu alıyoruz
+  const { setToken } = useAuth();
   const navigate = useNavigate();
 
   const handleLoginSubmit = async () => {
     try {
-      const data = await authService.login(email, password);  // Asenkron işlem await ile bekleniyor
+      const data = await authService.login(email, password);
       alert("Login success");
 
-      // Başarılı giriş sonrası token'ı AuthContext'e kaydediyoruz
-      setToken(data.token);  // authService'den dönen token bilgisi set ediliyor
-      console.log(data);
-      navigate("/home");  // Login başarılıysa ana sayfaya yönlendirme
+      setToken(data.token);
+      await redirectAfterLogin(data.token, navigate);
     } catch (error) {
       console.error("Login failed:", error);
-      alert("Login failed! Please try again.");  // Hata mesajı
+      alert("Login failed! Please try again.");
     }
   };
+
+  async function redirectAfterLogin(token: string, navigate: any) {
+    try {
+      const decoded = await authService.decodeToken(token);
+  
+      if (decoded.role === EnumRole.Admin) {
+        navigate("/adminDashboard");
+      } else {
+        navigate("/home");
+      }
+    } catch (error) {
+      console.error("Token decoding error:", error);
+      navigate("/home"); // Hata olursa varsayılan olarak /home
+    }
+  }
 
   return (
     <Container maxWidth="xl">

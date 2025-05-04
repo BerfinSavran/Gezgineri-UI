@@ -214,8 +214,8 @@ const TravelPage: React.FC = () => {
                 <Box sx={{ mt: 2 }}>
                     {tabValue === 0 && (
                         <Box>
-                            {places.length > 0 ? (
-                                places.map((place) => (
+                            {places.filter((place) => place.status === 1).length > 0 ? (
+                                places.filter((place) => place.status === 1).map((place) => (
                                     <Card
                                         onClick={() => handlePlaceCardClick(place.id)}
                                         key={place.id}
@@ -245,8 +245,8 @@ const TravelPage: React.FC = () => {
                     )}
                     {tabValue === 1 && (
                         <Box>
-                            {favoritePlaces.length > 0 ? (
-                                favoritePlaces.map((place) => (
+                            {favoritePlaces.filter((place) => place.status === 1).length > 0 ? (
+                                favoritePlaces.filter((place) => place.status === 1).map((place) => (
                                     <Card
                                         onClick={() => handlePlaceCardClick(place.id)}
                                         key={place.id}

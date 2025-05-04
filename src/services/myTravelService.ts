@@ -1,4 +1,4 @@
-import axios from "axios";
+import axiosInstance from "../context/axiosInstance";
 import { MyTravel } from "../types";
 
 const baseUrl = "https://localhost:7033/api/MyTravel";
@@ -6,7 +6,7 @@ const baseUrl = "https://localhost:7033/api/MyTravel";
 class MyTravelService {
     public async AddOrUpdateMyTravel(myTravel: Partial<MyTravel>) {
         try {
-            const response = await axios.post(baseUrl, myTravel);
+            const response = await axiosInstance.post(baseUrl, myTravel);
             return response.data;
         } catch (error) {
             console.error("Error creating or updating travel:", error);
@@ -16,7 +16,7 @@ class MyTravelService {
 
     public async GetAllMyTravels(): Promise<MyTravel[]> {
         try {
-            const response = await axios.get(baseUrl);
+            const response = await axiosInstance.get(baseUrl);
             return response.data;
         } catch (error) {
             console.error("Error getting travels:", error);
@@ -26,7 +26,7 @@ class MyTravelService {
 
     public async GetMyTravelById(id: string): Promise<MyTravel> {
         try {
-            const response = await axios.get(`${baseUrl}/id/${id}`);
+            const response = await axiosInstance.get(`${baseUrl}/id/${id}`);
             return response.data;
         } catch (error) {
             console.error("Error getting travel by id:", error);
@@ -36,7 +36,7 @@ class MyTravelService {
 
     public async DeleteMyTravel(id: string) {
         try {
-            const response = await axios.delete(`${baseUrl}?id=${id}`);
+            const response = await axiosInstance.delete(`${baseUrl}?id=${id}`);
             return response.data;
         } catch (error) {
             console.error("Error deleting travel:", error);
@@ -46,7 +46,7 @@ class MyTravelService {
 
     public async GetMyTravelsByTravelerId(travelerid: string): Promise<MyTravel[]> {
         try {
-            const response = await axios.get(`${baseUrl}/travelerid/${travelerid}`);
+            const response = await axiosInstance.get(`${baseUrl}/travelerid/${travelerid}`);
             return response.data;
         } catch (error) {
             console.error("Error getting travel by id:", error);

@@ -1,6 +1,6 @@
-import axios from "axios";
 import { Traveler } from "../types";
 import axiosInstance from "../context/axiosInstance";
+import axios from "axios";
 
 const baseUrl = "https://localhost:7033/api/Traveler";
 
@@ -11,6 +11,16 @@ class TravelerService{
             return response.data;
         } catch (error) {
             console.error("Error creating traveler: ", error);
+            throw error;
+        }
+    }
+
+    public async GetAllTravelers(): Promise<any> {
+        try {
+            const response = await axiosInstance.get(baseUrl);
+            return response.data;
+        } catch (error) {
+            console.error("Error getting travelers: ", error);
             throw error;
         }
     }
@@ -27,7 +37,7 @@ class TravelerService{
 
     public async UpdateTraveler(traveler : Partial<Traveler>) {
         try{
-            const response = await axios.put(baseUrl, traveler);
+            const response = await axiosInstance.put(baseUrl, traveler);
             return response.data;
         } catch (error) {
             console.error("Error getting traveler: ", error);

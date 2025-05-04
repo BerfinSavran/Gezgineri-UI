@@ -102,29 +102,45 @@ export default function AddPlacePage() {
                         flexDirection: "column",
                         gap: "10px"
                     }}>
-                        <TextField label="Yer Adı" variant="outlined" size="small" fullWidth name="name" value={place.name} onChange={handleInputChange} sx={{ mb: 1 }} />
-                        {/* Kategori Select */}
-                        <FormControl fullWidth variant="outlined" size="small" sx={{ mb: 1 }}>
-                            <InputLabel>Kategori</InputLabel>
-                            <Select
-                                name="categoryId"
-                                value={place.categoryId}
-                                onChange={handleCategoryChange}
-                                label="Kategori"
-                            >
-                                {categories.map((category) => (
-                                    <MenuItem key={category.id} value={category.id}>
-                                        {category.name}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                        <TextField label="Ülke" variant="outlined" size="small" fullWidth name="country" value={place.country} onChange={handleInputChange} sx={{ mb: 1 }} />
-                        <TextField label="Şehir" variant="outlined" size="small" fullWidth name="city" value={place.city} onChange={handleInputChange} sx={{ mb: 1 }} />
-                        <TextField label="Gezi Süresi" variant="outlined" size="small" fullWidth name="visitDuration" value={place.visitDuration} onChange={handleInputChange} sx={{ mb: 1 }} />
-                        <TextField label="Giriş Ücreti" variant="outlined" size="small" fullWidth name="entryPrice" value={place.entryPrice} onChange={handleInputChange} sx={{ mb: 1 }} />
-                        <TextField label="Kapasite" variant="outlined" size="small" fullWidth name="capacity" value={place.capacity} onChange={handleInputChange} sx={{ mb: 1 }} />
-                        <TextareaAutosize minRows={3} placeholder="Açıklama" name="description" value={place.description} onChange={handleInputChange} style={{ width: "100%", marginBottom: "8px" }} />
+                        <Box sx={{
+                            overflowY: "auto",
+                            flex: 1,
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: "10px",
+                            pr: 1,
+                            pb: 2,
+                        }}>
+                            <TextField label="Yer Adı" variant="outlined" size="small" fullWidth name="name" value={place.name} onChange={handleInputChange} sx={{ mb: 1 }} />
+                            {/* Kategori Select */}
+                            <FormControl fullWidth variant="outlined" size="small" sx={{ mb: 1 }}>
+                                <InputLabel>Kategori</InputLabel>
+                                <Select
+                                    name="categoryId"
+                                    value={place.categoryId}
+                                    onChange={handleCategoryChange}
+                                    label="Kategori"
+                                >
+                                    {categories.map((category) => (
+                                        <MenuItem key={category.id} value={category.id}>
+                                            {category.name}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                            <TextField label="Ülke" variant="outlined" size="small" fullWidth name="country" value={place.country} onChange={handleInputChange} sx={{ mb: 1 }} />
+                            <TextField label="Şehir" variant="outlined" size="small" fullWidth name="city" value={place.city} onChange={handleInputChange} sx={{ mb: 1 }} />
+                            <TextField label="Gezi Süresi" variant="outlined" size="small" fullWidth name="visitDuration" value={place.visitDuration} onChange={handleInputChange} sx={{ mb: 1 }} />
+                            <TextField label="Giriş Ücreti" variant="outlined" size="small" fullWidth name="entryPrice" value={place.entryPrice} onChange={handleInputChange} sx={{ mb: 1 }} />
+                            <TextField label="Kapasite" variant="outlined" size="small" fullWidth name="capacity" value={place.capacity} onChange={handleInputChange} sx={{ mb: 1 }} />
+                            <TextareaAutosize minRows={3} placeholder="Açıklama" name="description" value={place.description} onChange={handleInputChange} style={{
+                                width: "100%",
+                                marginBottom: "8px",
+                                boxSizing: "border-box",
+                                resize: "vertical",
+                                minHeight: "60px"
+                            }} />
+                        </Box>
                     </Card>
                 </Stack>
             </Card>

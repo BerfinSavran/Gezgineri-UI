@@ -9,11 +9,15 @@ import ToursPage from './pages/tours';
 import MyTravelPage from './pages/myTravel';
 import TravelPage from './pages/travel';
 import TourPage from './pages/tour';
-import { AuthProvider } from './context/authContext';
+import { AuthProvider, useAuth } from './context/authContext';
 import AddPlacePage from './pages/addPlace';
 import ApprovalPlacesPage from './pages/approvalPlaces';
+import ApprovalToursPage from './pages/approvalTours';
 import AddTourPage from './pages/addTour';
 import TourDetailsPage from './pages/tourDetails';
+import Sidebar from './components/sideBar';
+import AdminDashboard from './pages/adminDashboard';
+import { Box } from '@mui/material';
 
 
 function App() {
@@ -28,28 +32,34 @@ function App() {
 
 function AppContent() {
   const location = useLocation();
+  const { user } = useAuth();
   const hideNavPaths = ["/", "/register"];
 
   return (
     <div className="App">
-      {!hideNavPaths.includes(location.pathname) && <NavBar />}
-      
-      <Routes>
-        <Route path="/" element={<LoginPage />} /> 
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/home" element={<HomePage />} /> 
-        <Route path="/profile" element={<ProfilePage/>} />
-        <Route path="/place/:id" element={<PlacePage/>}/>
-        <Route path="/tours" element={<ToursPage/>}/>
-        <Route path="/tour/id/:id" element={<TourPage/>}/>
-        <Route path="/myTravel" element={<MyTravelPage/>}/>
-        <Route path="/travel/:id" element={<TravelPage/>}/>
-        <Route path='/addPlace' element={<AddPlacePage/>}/>
-        <Route path='/addTour' element={<AddTourPage/>}/>
-        <Route path="/tourDetails/:id" element={<TourDetailsPage/>}/>
-        <Route path='/approvalPlaces' element={<ApprovalPlacesPage/>}/>
+      {user?.role === 0 && !hideNavPaths.includes(location.pathname) && <Sidebar />}
 
-      </Routes>
+      <Box sx={{ marginLeft: user?.role === 0 && !hideNavPaths.includes(location.pathname) ? '150px' : '0px', width: '100%' }}>
+        {(user?.role !== 0 && !hideNavPaths.includes(location.pathname)) && <NavBar />}
+
+        <Routes>
+          <Route path="/" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/home" element={<HomePage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/place/:id" element={<PlacePage />} />
+          <Route path="/tours" element={<ToursPage />} />
+          <Route path="/tour/id/:id" element={<TourPage />} />
+          <Route path="/myTravel" element={<MyTravelPage />} />
+          <Route path="/travel/:id" element={<TravelPage />} />
+          <Route path='/addPlace' element={<AddPlacePage />} />
+          <Route path='/addTour' element={<AddTourPage />} />
+          <Route path="/tourDetails/:id" element={<TourDetailsPage />} />
+          <Route path='/approvalPlaces' element={<ApprovalPlacesPage />} />
+          <Route path='/approvalTours' element={<ApprovalToursPage />} />
+          <Route path='/adminDashboard' element={<AdminDashboard />} />
+        </Routes>
+      </Box>
     </div>
   );
 }

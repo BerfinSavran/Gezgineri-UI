@@ -28,7 +28,8 @@ export default function HomePage() {
         try {
             const data = await placeService.GetAllPlaces();
             if (data && Array.isArray(data)) {
-                setPlacesforTraveler(data); // Sadece dizi geldiğinde state güncelle
+                const approvedPlaces = data.filter(place => place.status === 1); // 1 = Approved
+                setPlacesforTraveler(approvedPlaces); // Sadece dizi geldiğinde state güncelle
             } else {
                 console.error("Beklenmeyen API yanıtı:", data);
                 setPlacesforTraveler([]); // Hata durumunda boş dizi ata
@@ -74,7 +75,8 @@ export default function HomePage() {
         if (!user?.ownerId) return;
         try {
             const data = await placeService.GetPlacesByOwnerIdWithInclude(user?.ownerId);
-            setPlacesforOwner(data);
+            const approvedPlaces = data.filter((place: Place) => place.status === 1); // 1 = Approved
+            setPlacesforOwner(approvedPlaces);
         } catch (error) {
             console.error("Error fetching places:", error);
         }
@@ -84,7 +86,8 @@ export default function HomePage() {
         if (!user?.agencyId) return;
         try {
             const data = await tourService.GetToursByAgencyIdWithInclude(user?.agencyId);
-            setTours(data);
+            const approvedTours = data.filter((tour: Tour) => tour.status === 1);
+            setTours(approvedTours);
         } catch (error) {
             console.error("Error fetching tours:", error);
         }
@@ -155,7 +158,7 @@ export default function HomePage() {
                                                     {card.title}
                                                 </Typography>
                                                 <Typography variant="body2" color="text.secondary">
-                                                    {card.country +"," + card.city}
+                                                    {card.country + "," + card.city}
                                                 </Typography>
                                             </CardContent>
                                         </Card>
@@ -171,7 +174,7 @@ export default function HomePage() {
                     </Stack>
 
                 );
-            case 2:
+            case 2: //agency
                 return (
 
                     <Stack spacing={5} alignItems={"center"}>
@@ -181,9 +184,13 @@ export default function HomePage() {
                                 key={tour.id}
                                 sx={{
                                     width: "100%",
-                                    height: "200px",
+                                    height: "auto", // Kartın minimum yüksekliğini ayarlayalım
                                     border: "1px solid",
-                                    padding: 2
+                                    padding: 2,
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    justifyContent: 'space-between', // İçeriği alt ve üst arasında paylaştırır
+                                    overflow: 'hidden', // Taşan içerik gizlenir
                                 }}>
                                 <Stack direction={"row"} spacing={2}>
                                     <Card sx={{
@@ -221,7 +228,7 @@ export default function HomePage() {
                     </Stack>
 
                 );
-            case 3:
+            case 3: // owner
                 return (
 
                     <Stack spacing={5} alignItems={"center"}>
@@ -231,9 +238,13 @@ export default function HomePage() {
                                 key={place.id}
                                 sx={{
                                     width: "100%",
-                                    height: "200px",
+                                    height: "auto", // Kartın minimum yüksekliğini ayarlayalım
                                     border: "1px solid",
-                                    padding: 2
+                                    padding: 2,
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    justifyContent: 'space-between', // İçeriği alt ve üst arasında paylaştırır
+                                    overflow: 'hidden', // Taşan içerik gizlenir
                                 }}>
                                 <Stack direction={"row"} spacing={2}>
                                     <Card sx={{

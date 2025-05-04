@@ -1,4 +1,4 @@
-import { Box, Button, Card, Container, IconButton, Stack, TextareaAutosize, TextField, Typography } from "@mui/material";
+import { Box, Button, Card, Container, Stack, TextareaAutosize, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { EnumRole, Tour, TourRoute } from "../types";
@@ -21,6 +21,7 @@ export default function TourPage() {
     useEffect(() => {
         fetchTourDetails();
         fetchTourRoutes();
+        console.log(tour?.webSiteUrl);
     }, [id]);
 
     const fetchTourDetails = async () => {
@@ -55,17 +56,42 @@ export default function TourPage() {
     };
 
     const handleSaveChanges = async () => {
+        const startDate = editedTour.startDate || tour?.startDate;
+        const endDate = editedTour.endDate || tour?.endDate;
+
+        // Her iki tarih de mevcutsa, tarihlerin doğruluğunu kontrol etmeliyiz
+        if (startDate && endDate) {
+            const startDateObj = new Date(startDate);
+            const endDateObj = new Date(endDate);
+
+            // Başlangıç tarihi bitiş tarihinden sonra olamaz
+            if (startDateObj > endDateObj) {
+                alert("Başlangıç tarihi, bitiş tarihinden sonra olamaz.");
+                return;
+            }
+
+            // Bitiş tarihi başlangıç tarihinden önce olamaz
+            if (endDateObj < startDateObj) {
+                alert("Bitiş tarihi, başlangıç tarihinden önce olamaz.");
+                return;
+            }
+        }
+
         const updatedTourData: Partial<Tour> = {
             ...editedTour,
             id: id,
             agencyId: tour?.agencyId,
-            name: editedTour.name || tour?.name,
+            name: tour?.name,
             startDate: editedTour.startDate || tour?.startDate,
             endDate: editedTour.endDate || tour?.endDate,
             price: editedTour.price || tour?.price,
             capacity: editedTour.capacity || tour?.capacity,
             description: editedTour.description || tour?.description,
+            imageUrl: editedTour.imageUrl || tour?.imageUrl,
+            webSiteUrl: tour?.webSiteUrl,
+            status: tour?.status,
         };
+
 
         try {
             const updatedTour = await tourService.AddOrUpdateTour(updatedTourData);
@@ -77,6 +103,7 @@ export default function TourPage() {
         handleEditToggle();
         fetchTourDetails();
     };
+
 
     const handleDelete = async () => {
         if (!id) {
@@ -176,8 +203,18 @@ export default function TourPage() {
                             fontSize: "18px",
                             color: "gray"
                         }}>
-                            {tour.imageUrl ? (
-                                <img src={tour.imageUrl} alt={tour.name} style={{ width: "100%", height: "100%" }} />
+                            {isEditing && editedTour.imageUrl ? (
+                                <img
+                                    src={editedTour.imageUrl}
+                                    alt={tour.name}
+                                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                                />
+                            ) : tour.imageUrl ? (
+                                <img
+                                    src={tour.imageUrl}
+                                    alt={tour.name}
+                                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                                />
                             ) : "Fotoğraf"}
                         </Card>
                         <Typography variant="body1" sx={{ mt: "20px" }}>Lokasyonlar: {locationList} </Typography>
@@ -194,115 +231,149 @@ export default function TourPage() {
                         flexDirection: "column",
                         gap: "15px"
                     }}>
-                        {isEditing ? (
-                            <>
-                                <TextField
-                                    label="Acenta Adı"
-                                    variant="outlined"
-                                    size="small"
-                                    fullWidth
-                                    name="name"
-                                    value={editedTour.name ?? tour.name ?? ""}
-                                    onChange={handleInputChange}
-                                    sx={{ mb: 1 }}
-                                />
-                                <TextField
-                                    label="Başlangıç Tarihi"
-                                    variant="outlined"
-                                    size="small"
-                                    fullWidth
-                                    name="startDate"
-                                    type="date"
-                                    value={formatDate(editedTour.startDate ?? tour.startDate)}
-                                    onChange={handleInputChange}
-                                    sx={{ mb: 1 }}
-                                />
-                                <TextField
-                                    label="Bitiş Tarihi"
-                                    variant="outlined"
-                                    size="small"
-                                    fullWidth
-                                    name="endDate"
-                                    type="date"
-                                    value={formatDate(editedTour.endDate ?? tour.endDate)}
-                                    onChange={handleInputChange}
-                                    sx={{ mb: 1 }}
-                                />
-                                <TextField
-                                    label="Tur Ücreti"
-                                    variant="outlined"
-                                    size="small"
-                                    fullWidth
-                                    name="price"
-                                    value={editedTour.price ?? tour.price ?? ""}
-                                    onChange={handleInputChange}
-                                    sx={{ mb: 1 }}
-                                />
-                                <TextField
-                                    label="Kapasitesi"
-                                    variant="outlined"
-                                    size="small"
-                                    fullWidth
-                                    name="capacity"
-                                    value={editedTour.capacity ?? tour.capacity ?? ""}
-                                    onChange={handleInputChange}
-                                    sx={{ mb: 1 }}
-                                />
-                                <TextareaAutosize
-                                    minRows={3}
-                                    placeholder="Açıklama"
-                                    name="description"
-                                    value={editedTour.description ?? tour.description ?? ""}
-                                    onChange={handleInputChange}
-                                    style={{ width: "100%", marginBottom: "8px" }}
-                                />
-                                
-                            </>
-                        ) : (
-                            <>
-                                <Stack direction="row" justifyContent="space-between">
-                                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>Acentanın Adı:</Typography>
-                                    <Typography variant="body1">{tour.companyName}</Typography>
-                                </Stack>
-                                <Stack direction="row" justifyContent="space-between">
-                                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>Başlangıç Tarihi:</Typography>
-                                    <Typography variant="body1">{formatDateForTypography(tour.startDate)}</Typography>
-                                </Stack>
-                                <Stack direction="row" justifyContent="space-between">
-                                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>Bitiş Tarihi:</Typography>
-                                    <Typography variant="body1">{formatDateForTypography(tour.endDate)}</Typography>
-                                </Stack>
-                                <Stack direction="row" justifyContent="space-between">
-                                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>Kapasitesi:</Typography>
-                                    <Typography variant="body1">{tour.capacity}</Typography>
-                                </Stack>
-                                <Stack direction="row" justifyContent="space-between">
-                                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>Fiyatı:</Typography>
-                                    <Typography variant="body1">{tour.price}</Typography>
-                                </Stack>
-                                <Stack direction="row" justifyContent="space-between">
-                                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>Açıklaması:</Typography>
-                                    <Typography variant="body1">{tour.description}</Typography>
-                                </Stack>
-                                <Stack direction="row" justifyContent="space-between">
-                                    <Button
+                        <Box sx={{
+                            overflowY: "auto",
+                            flex: 1,
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: "10px",
+                            pr: 1,
+                            pb: 2,
+                        }}>
+                            {isEditing ? (
+                                <>
+                                    <TextField
+                                        label="Tur Adı"
                                         variant="outlined"
-                                        sx={{ mt: "10px" }}
-                                        onClick={() => navigate(`/tourDetails/${id}`)}
-                                    >
-                                        Detayları Gör
-                                    </Button>
-                                    {isAgency &&
-                                        <Button variant="outlined" onClick={handleOpenModal}>Tur Rotası Ekle</Button>
-                                    }
+                                        size="small"
+                                        fullWidth
+                                        name="name"
+                                        value={editedTour.name ?? tour.name ?? ""}
+                                        onChange={handleInputChange}
+                                        sx={{ mb: 1 }}
+                                    />
+                                    <TextField
+                                        label="Başlangıç Tarihi"
+                                        variant="outlined"
+                                        size="small"
+                                        fullWidth
+                                        name="startDate"
+                                        type="date"
+                                        value={formatDate(editedTour.startDate ?? tour.startDate)}
+                                        onChange={handleInputChange}
+                                        sx={{ mb: 1 }}
+                                    />
+                                    <TextField
+                                        label="Bitiş Tarihi"
+                                        variant="outlined"
+                                        size="small"
+                                        fullWidth
+                                        name="endDate"
+                                        type="date"
+                                        value={formatDate(editedTour.endDate ?? tour.endDate)}
+                                        onChange={handleInputChange}
+                                        sx={{ mb: 1 }}
+                                    />
+                                    <TextField
+                                        label="Tur Ücreti"
+                                        variant="outlined"
+                                        size="small"
+                                        fullWidth
+                                        name="price"
+                                        value={editedTour.price ?? tour.price ?? ""}
+                                        onChange={handleInputChange}
+                                        sx={{ mb: 1 }}
+                                    />
+                                    <TextField
+                                        label="Kapasitesi"
+                                        variant="outlined"
+                                        size="small"
+                                        fullWidth
+                                        name="capacity"
+                                        value={editedTour.capacity ?? tour.capacity ?? ""}
+                                        onChange={handleInputChange}
+                                        sx={{ mb: 1 }}
+                                    />
+                                    <TextareaAutosize
+                                        minRows={3}
+                                        placeholder="Açıklama"
+                                        name="description"
+                                        value={editedTour.description ?? tour.description ?? ""}
+                                        onChange={handleInputChange}
+                                        style={{
+                                            width: "100%",
+                                            marginBottom: "8px",
+                                            boxSizing: "border-box",
+                                            resize: "vertical",
+                                            minHeight: "60px"
+                                        }}
+                                    />
+                                    <TextField
+                                        label="Görsel URL"
+                                        variant="outlined"
+                                        size="small"
+                                        fullWidth
+                                        name="imageUrl"
+                                        value={editedTour.imageUrl ?? tour.imageUrl ?? ""}
+                                        onChange={handleInputChange}
+                                        sx={{ mb: 1 }}
+                                    />
+                                </>
+                            ) : (
+                                <>
+                                    <Stack direction="row" justifyContent="space-between">
+                                        <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>Acentanın Adı:</Typography>
+                                        <Typography variant="body1">{tour.companyName}</Typography>
+                                    </Stack>
+                                    <Stack direction="row" justifyContent="space-between">
+                                        <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>Başlangıç Tarihi:</Typography>
+                                        <Typography variant="body1">{formatDateForTypography(tour.startDate)}</Typography>
+                                    </Stack>
+                                    <Stack direction="row" justifyContent="space-between">
+                                        <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>Bitiş Tarihi:</Typography>
+                                        <Typography variant="body1">{formatDateForTypography(tour.endDate)}</Typography>
+                                    </Stack>
+                                    <Stack direction="row" justifyContent="space-between">
+                                        <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>Kapasitesi:</Typography>
+                                        <Typography variant="body1">{tour.capacity}</Typography>
+                                    </Stack>
+                                    <Stack direction="row" justifyContent="space-between">
+                                        <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>Fiyatı:</Typography>
+                                        <Typography variant="body1">{tour.price}</Typography>
+                                    </Stack>
+                                    <Stack direction="row" justifyContent="space-between">
+                                        <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>Açıklaması:</Typography>
+                                        <Typography variant="body1">{tour.description}</Typography>
+                                    </Stack>
+                                    {tour.webSiteUrl && (
+                                        <Stack direction="row" justifyContent="space-between">
+                                            <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>Web Sitesi:</Typography>
+                                            <a href={tour.webSiteUrl} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none", color: "#1976d2" }}>
+                                                {tour.webSiteUrl}
+                                            </a>
+                                        </Stack>
+                                    )}
 
-                                </Stack>
-                            </>
-                        )}
+                                    <Stack direction="row" justifyContent="space-between">
+                                        <Button
+                                            variant="outlined"
+                                            sx={{ mt: "10px" }}
+                                            onClick={() => navigate(`/tourDetails/${id}`)}
+                                        >
+                                            Detayları Gör
+                                        </Button>
+                                        {isAgency &&
+                                            <Button variant="outlined" onClick={handleOpenModal}>Tur Rotası Ekle</Button>
+                                        }
+
+                                    </Stack>
+                                </>
+                            )}
+                        </Box>
                     </Card>
                 </Stack>
             </Card>
-            <TourRouteModal open={modalOpen} handleClose={handleCloseModal} tourId={tour.id ?? ""}/>
+            <TourRouteModal open={modalOpen} handleClose={handleCloseModal} tourId={tour.id ?? ""} />
         </Container>
     )
 }
