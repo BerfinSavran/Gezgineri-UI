@@ -6,7 +6,8 @@ import { EnumRole, TourRoute } from "../types";
 import tourRouteService from "../services/tourRouteService";
 import TourRouteModal from "../components/tourRouteModal";
 import { useAuth } from "../context/authContext";
-import { showErrorToast } from "../utils/toastHelper";
+import { showErrorToast, showSuccessToast } from "../utils/toastHelper";
+import ConfirmDeleteDialog from "../components/confirmDeleteDialog";
 
 export default function TourDetailsPage() {
     const { id } = useParams();
@@ -14,6 +15,9 @@ export default function TourDetailsPage() {
     const [routes, setRoutes] = useState<TourRoute[]>([]);
     const [open, setOpen] = useState(false);
     const [selectedRoute, setSelectedRoute] = useState<TourRoute | null>(null);
+    const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
+    const [routeToDeleteId, setRouteToDeleteId] = useState<string | null>(null);
+
 
     useEffect(() => {
         fetchTourRoutes();
@@ -51,21 +55,29 @@ export default function TourDetailsPage() {
     };
 
 
-    const handleDelete = async (routeId: string) => {
-        if (!routeId) {
+    const handleDeleteConfirm = async () => {
+        if (!routeToDeleteId) {
             showErrorToast("Silinecek rotanın ID'si bulunamadı.");
             return;
         }
         try {
-            await tourRouteService.DeleteTourRoute(routeId);
-            showErrorToast("Rota başarıyla silindi");
+            await tourRouteService.DeleteTourRoute(routeToDeleteId);
+            showSuccessToast("Rota başarıyla silindi");
             fetchTourRoutes();
-        }
-        catch (err) {
+        } catch (err) {
             const errorMessage = err instanceof Error ? err.message : "Rota silinirken hata oluştu.";
             showErrorToast(errorMessage);
+        } finally {
+            setConfirmDeleteOpen(false);
+            setRouteToDeleteId(null);
         }
     };
+
+    const askForDeleteConfirmation = (id: string) => {
+        setRouteToDeleteId(id);
+        setConfirmDeleteOpen(true);
+    };
+
 
 
     const handleClose = () => {
@@ -106,7 +118,13 @@ export default function TourDetailsPage() {
                                                 {isAgency &&
                                                     <Stack direction="row" spacing={1}>
                                                         <Button variant="outlined" onClick={() => handleEditRoute(route)}>Düzenle</Button>
-                                                        <Button variant="outlined" color="error" onClick={() => route.id && handleDelete(route.id)}>Sil</Button>
+                                                        <Button
+                                                            variant="outlined"
+                                                            color="error"
+                                                            onClick={() => route.id && askForDeleteConfirmation(route.id)}
+                                                        >
+                                                            Sil
+                                                        </Button>
                                                     </Stack>
                                                 }
                                             </Stack>
@@ -118,6 +136,13 @@ export default function TourDetailsPage() {
                     </Accordion>
                 ))}
             </Container>
+
+            <ConfirmDeleteDialog
+                open={confirmDeleteOpen}
+                onClose={() => setConfirmDeleteOpen(false)}
+                onConfirm={handleDeleteConfirm}
+                message="Bu tur rotasını silmek istediğinizden emin misiniz?"
+            />
 
             {/* Modal Bileşeni */}
             <TourRouteModal

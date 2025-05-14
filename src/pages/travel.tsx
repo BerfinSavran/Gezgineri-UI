@@ -91,7 +91,7 @@ const TravelPage: React.FC = () => {
     const removeTravelPlan = async (planId: string) => {
         try {
             await myTravelPlanService.DeleteTravelPlan(planId);
-            showErrorToast("Seyahat planı çıkarıldı.");
+            showSuccessToast("Seyahat planı başarıyla silindi.");
             fetchTravelPlans();
         } catch (err) {
             const errorMessage = err instanceof Error ? err.message : "Seyahat planı silinirken hata oluştu.";
@@ -152,7 +152,6 @@ const TravelPage: React.FC = () => {
                 prev.map((plan) => (plan.id === id ? { ...plan, date: selectedDate } : plan))
             );
 
-            showSuccessToast("Seyahat planı başarıyla kaydedildi.");
             handleCloseModal();
             fetchTravelPlans();
         } catch (err) {

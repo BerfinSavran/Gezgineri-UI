@@ -19,6 +19,8 @@ import Sidebar from './components/sideBar';
 import AdminDashboard from './pages/adminDashboard';
 import { Box } from '@mui/material';
 import Categories from './pages/categories';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 
 function App() {
@@ -26,6 +28,7 @@ function App() {
     <AuthProvider>
       <Router>
         <AppContent />
+        <ToastContainer /> 
       </Router>
     </AuthProvider>
   );

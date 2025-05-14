@@ -9,6 +9,7 @@ import { useAuth } from "../context/authContext";
 import favoritePlaceService from "../services/favoritePlaceService";
 import categoryService from "../services/categoryService";
 import { showErrorToast, showSuccessToast } from "../utils/toastHelper";
+import ConfirmDeleteDialog from "../components/confirmDeleteDialog";
 
 export default function PlacePage() {
     const [isFavorited, setIsFavorited] = useState(false);
@@ -19,6 +20,8 @@ export default function PlacePage() {
     const [categories, setCategories] = useState<Category[]>([]);
     const [editedPlace, setEditedPlace] = useState<Partial<Place>>({});
     const { user } = useAuth();
+    const [openDialog, setOpenDialog] = useState(false);
+
 
     const fetchPlaceDetails = async () => {
         try {
@@ -109,24 +112,34 @@ export default function PlacePage() {
         fetchPlaceDetails();
     };
 
-    const handleDelete = async () => {
+
+    const handleDelete = () => {
         if (!id) {
             showErrorToast("Silinecek yerin ID'si bulunamadı.");
             return;
         }
+        setOpenDialog(true); // Dialog'u açıyoruz
+    };
+
+    const handleDialogClose = () => {
+        setOpenDialog(false); // Dialog'u kapatıyoruz
+    };
+
+    const handleConfirmDelete = async () => {
+        setOpenDialog(false); // Dialog'u kapatıyoruz
         try {
-            await placeService.DeletePlace(id)
-            .then(()=>{showSuccessToast("Mekan başarıyla silindi.")})
-            .catch((err)=>{showErrorToast(err)});
-            
-            navigate("/home");
-        }
-        catch (err) {
+            if (!id) {
+                showErrorToast("Silinecek yerin ID'si bulunamadı.");
+                return;
+            }
+            await placeService.DeletePlace(id); // Silme işlemi
+            showSuccessToast("Mekan başarıyla silindi.");
+            navigate("/home"); // Silme işlemi sonrası ana sayfaya yönlendirme
+        } catch (err) {
             const errorMessage = err instanceof Error ? err.message : "Mekan silinirken hata oluştu.";
             showErrorToast(errorMessage);
         }
     };
-
 
     useEffect(() => {
         fetchPlaceDetails();
@@ -374,6 +387,13 @@ export default function PlacePage() {
 
                 </Stack>
             </Card>
+            <ConfirmDeleteDialog
+                open={openDialog}
+                onClose={handleDialogClose}
+                onConfirm={handleConfirmDelete} // Onay alındığında silme işlemi
+                message="Bu mekanı silmek istediğinizden emin misiniz?"
+            />
         </Container>
+
     );
 }

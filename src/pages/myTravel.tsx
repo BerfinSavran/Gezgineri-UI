@@ -9,7 +9,7 @@ import myTravelService from "../services/myTravelService";
 import { MyTravel } from "../types";
 import { useAuth } from "../context/authContext";
 import ConfirmDeleteDialog from "../components/confirmDeleteDialog";
-import { showErrorToast } from "../utils/toastHelper";
+import { showErrorToast, showSuccessToast } from "../utils/toastHelper";
 
 export default function MyTravelPage() {
     const { user } = useAuth();
@@ -56,6 +56,7 @@ export default function MyTravelPage() {
         if (selectedTravelId) {
             try {
                 await myTravelService.DeleteMyTravel(selectedTravelId);
+                showSuccessToast("Seyahat başarıyla silindi.");
                 fetchMyTravels();
                 handleDeleteDialogClose();
             } catch (err) {
@@ -133,6 +134,7 @@ export default function MyTravelPage() {
                 open={deleteDialogOpen}
                 onClose={handleDeleteDialogClose}
                 onConfirm={handleTravelDelete}
+                message="Bu seyahati silmek istediğinizden emin misiniz?"
             />
         </Container>
     );

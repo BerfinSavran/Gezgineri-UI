@@ -7,6 +7,7 @@ import tourService from "../services/tourService";
 import tourRouteService from "../services/tourRouteService";
 import TourRouteModal from "../components/tourRouteModal";
 import { showErrorToast, showSuccessToast } from "../utils/toastHelper";
+import ConfirmDeleteDialog from "../components/confirmDeleteDialog";
 
 export default function TourPage() {
     const { id } = useParams();
@@ -17,6 +18,8 @@ export default function TourPage() {
     const [isEditing, setIsEditing] = useState(false);
     const [editedTour, setEditedTour] = useState<Partial<Tour>>({});
     const { user } = useAuth();
+    const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
+
 
     useEffect(() => {
         fetchTourDetails();
@@ -112,7 +115,7 @@ export default function TourPage() {
         }
         try {
             await tourService.DeleteTour(id);
-            showErrorToast("Başarıyla silindi.");
+            showSuccessToast("Başarıyla silindi.");
             navigate("/home");
         }
         catch (err) {
@@ -183,9 +186,14 @@ export default function TourPage() {
                                     <Button variant="outlined" sx={{ mr: "15px", mt: "10px" }} onClick={handleEditToggle}>
                                         {'Düzenle'}
                                     </Button>
-                                    <Button variant="outlined" sx={{ mr: "15px", mt: "10px" }} onClick={handleDelete}>
+                                    <Button
+                                        variant="outlined"
+                                        sx={{ mr: "15px", mt: "10px" }}
+                                        onClick={() => setConfirmDeleteOpen(true)}
+                                    >
                                         {"Sil"}
                                     </Button>
+
 
                                 </Stack>
                         )}
@@ -375,6 +383,13 @@ export default function TourPage() {
                 </Stack>
             </Card>
             <TourRouteModal open={modalOpen} handleClose={handleCloseModal} tourId={tour.id ?? ""} />
+            <ConfirmDeleteDialog
+                open={confirmDeleteOpen}
+                onClose={() => setConfirmDeleteOpen(false)}
+                onConfirm={handleDelete}
+                message={"Bu turu silmek istediğinizden emin misiniz ?"}
+            />
+
         </Container>
     )
 }
