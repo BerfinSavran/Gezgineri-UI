@@ -21,7 +21,7 @@ const TravelPlanAccordion: React.FC<TravelPlanAccordionProps> = ({ day, plan, on
             <AccordionDetails>
                 {plan.length > 0 ? (
                     plan.map((item, index) =>
-                        item.place ? ( // place tanımlı mı kontrol et
+                        item.place ? (
                             <Stack key={index} direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1 }}>
                                 <Typography>
                                     📍 {item.place.name} - {item.place.city} - {item.place.categoryName}

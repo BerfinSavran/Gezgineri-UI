@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import authService from "../services/authService";
 import { useAuth } from "../context/authContext";
 import { EnumRole } from "../types";
+import { showErrorToast, showSuccessToast } from "../utils/toastHelper";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -14,28 +15,27 @@ export default function LoginPage() {
   const handleLoginSubmit = async () => {
     try {
       const data = await authService.login(email, password);
-      alert("Login success");
+      showSuccessToast("Giriş başarılı.");
 
       setToken(data.token);
       await redirectAfterLogin(data.token, navigate);
     } catch (error) {
-      console.error("Login failed:", error);
-      alert("Login failed! Please try again.");
+      showErrorToast("Giriş başarısız! Lütfen tekrar deneyin.");
     }
   };
 
   async function redirectAfterLogin(token: string, navigate: any) {
     try {
       const decoded = await authService.decodeToken(token);
-  
+
       if (decoded.role === EnumRole.Admin) {
         navigate("/adminDashboard");
       } else {
         navigate("/home");
       }
     } catch (error) {
-      console.error("Token decoding error:", error);
-      navigate("/home"); // Hata olursa varsayılan olarak /home
+      showErrorToast("Token çözümleme hatası. Ana sayfaya yönlendiriliyorsunuz.");
+      navigate("/home");
     }
   }
 
@@ -47,16 +47,16 @@ export default function LoginPage() {
             <Typography variant="h4" sx={{ padding: "50px" }}>Gezgineri</Typography>
             <Stack direction={"row"} spacing={2} alignItems="center" sx={{ marginBottom: "20px" }}>
               <Typography variant="h6" sx={{ width: "100px" }}>E-mail:</Typography>
-              <TextField 
+              <TextField
                 fullWidth
                 value={email}
-                onChange={(e) => setEmail(e.target.value)} 
+                onChange={(e) => setEmail(e.target.value)}
               />
             </Stack>
             <Stack direction={"row"} spacing={2} alignItems="center">
               <Typography variant="h6" sx={{ width: "100px" }}>Şifre:</Typography>
-              <TextField 
-                type="password" 
+              <TextField
+                type="password"
                 fullWidth
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}

@@ -4,7 +4,6 @@ import axiosInstance from "../context/axiosInstance";
 const baseUrl = "https://localhost:7033/api/Category";
 
 class CategoryService {
-    // Kategori Ekle veya Güncelle
     public async AddOrUpdateCategory(category: Partial<Category>) {
         try {
             const response = await axiosInstance.post(baseUrl, category);
@@ -15,7 +14,6 @@ class CategoryService {
         }
     }
 
-    // Kategori Sil
     public async DeleteCategory(id: string) {
         try {
             const response = await axiosInstance.delete(`${baseUrl}?id=${id}`);
@@ -26,7 +24,6 @@ class CategoryService {
         }
     }
 
-    // Tüm Kategorileri Getir
     public async GetAllCategories() {
         try {
             const response = await axiosInstance.get(baseUrl);
@@ -37,7 +34,6 @@ class CategoryService {
         }
     }
 
-    // ID ile Kategori Getir
     public async GetCategoryById(id: string) {
         try {
             const response = await axiosInstance.get(`${baseUrl}/id/${id}`);

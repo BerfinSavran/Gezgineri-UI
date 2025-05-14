@@ -6,7 +6,7 @@ import { useAuth } from "../context/authContext";
 import tourService from "../services/tourService";
 import tourRouteService from "../services/tourRouteService";
 import TourRouteModal from "../components/tourRouteModal";
-
+import { showErrorToast, showSuccessToast } from "../utils/toastHelper";
 
 export default function TourPage() {
     const { id } = useParams();
@@ -21,7 +21,6 @@ export default function TourPage() {
     useEffect(() => {
         fetchTourDetails();
         fetchTourRoutes();
-        console.log(tour?.webSiteUrl);
     }, [id]);
 
     const fetchTourDetails = async () => {
@@ -30,8 +29,9 @@ export default function TourPage() {
                 const data = await tourService.GetTourByIdWithInclude(id);
                 setTour(data);
             }
-        } catch (error) {
-            console.error("Error fetching tour details:", error);
+        } catch (err) {
+            const errorMessage = err instanceof Error ? err.message : "Tur detayları alınırken hata oluştu.";
+            showErrorToast(errorMessage);
         }
     };
 
@@ -41,8 +41,9 @@ export default function TourPage() {
                 const data = await tourRouteService.GetTourRoutesByTourId(id);
                 setTourRoutes(data);
             }
-        } catch (error) {
-            console.error("Error fetching tour routes:", error);
+        } catch (err) {
+            const errorMessage = err instanceof Error ? err.message : "Tur rotaları alınırken hata oluştu.";
+            showErrorToast(errorMessage);
         }
     };
 
@@ -59,20 +60,17 @@ export default function TourPage() {
         const startDate = editedTour.startDate || tour?.startDate;
         const endDate = editedTour.endDate || tour?.endDate;
 
-        // Her iki tarih de mevcutsa, tarihlerin doğruluğunu kontrol etmeliyiz
         if (startDate && endDate) {
             const startDateObj = new Date(startDate);
             const endDateObj = new Date(endDate);
 
-            // Başlangıç tarihi bitiş tarihinden sonra olamaz
             if (startDateObj > endDateObj) {
-                alert("Başlangıç tarihi, bitiş tarihinden sonra olamaz.");
+                showErrorToast("Başlangıç tarihi, bitiş tarihinden sonra olamaz.");
                 return;
             }
 
-            // Bitiş tarihi başlangıç tarihinden önce olamaz
             if (endDateObj < startDateObj) {
-                alert("Bitiş tarihi, başlangıç tarihinden önce olamaz.");
+                showErrorToast("Bitiş tarihi, başlangıç tarihinden önce olamaz.");
                 return;
             }
         }
@@ -95,10 +93,12 @@ export default function TourPage() {
 
         try {
             const updatedTour = await tourService.AddOrUpdateTour(updatedTourData);
+            showSuccessToast("Tur başarıyla güncellendi.");
             setTour(updatedTour);
             setIsEditing(false);
-        } catch (error) {
-            console.error("Error saving tour changes:", error);
+        } catch (err) {
+            const errorMessage = err instanceof Error ? err.message : "Tur güncellenirken hata oluştu.";
+            showErrorToast(errorMessage);
         }
         handleEditToggle();
         fetchTourDetails();
@@ -107,16 +107,17 @@ export default function TourPage() {
 
     const handleDelete = async () => {
         if (!id) {
-            console.error("Silinecek turun ID'si bulunamadı.");
+            showErrorToast("Silinecek turun ID'si bulunamadı.");
             return;
         }
         try {
             await tourService.DeleteTour(id);
-            alert("Deleted successfully");
+            showErrorToast("Başarıyla silindi.");
             navigate("/home");
         }
-        catch (error) {
-            console.error("Error deleting tour:", error);
+        catch (err) {
+            const errorMessage = err instanceof Error ? err.message : "Tur silinirken hata oluştu.";
+            showErrorToast(errorMessage);
         }
     };
 

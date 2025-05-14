@@ -5,6 +5,7 @@ import travelerService from '../services/travelerService';
 import agencyService from '../services/agencyService';
 import ownerService from '../services/ownerService';
 import { useAuth } from '../context/authContext';
+import { showErrorToast, showSuccessToast } from '../utils/toastHelper';
 
 export default function ProfilePage() {
     const { user } = useAuth();
@@ -47,7 +48,7 @@ export default function ProfilePage() {
                     setOwnerId(userData.id);
                     break;
                 default:
-                    console.error('Unknown role');
+                    showErrorToast('Unknown role');
                     return;
             }
             setFormData(userData);
@@ -55,7 +56,8 @@ export default function ProfilePage() {
                 localStorage.setItem('gender', userData.gender === 0 ? '0' : '1');
             }
         } catch (err) {
-            console.error('Error fetching user data', err);
+            const errorMessage = err instanceof Error ? err.message : "Kullanıcı dataları alınırken hata oluştu.";
+            showErrorToast(errorMessage);
         }
     };
 
@@ -70,29 +72,35 @@ export default function ProfilePage() {
             switch (user?.role) {
                 case EnumRole.Traveler:
                     if (!travelerId) {
-                        console.error("Traveler ID bulunamadı!");
+                        showErrorToast("Traveler ID bulunamadı!");
                         return;
                     }
                     updatedData = { ...updatedData, id: travelerId };
-                    await travelerService.UpdateTraveler(updatedData);
+                    await travelerService.UpdateTraveler(updatedData)
+                        .then(() => { showSuccessToast("Gezgin başarıyla güncellendi.") })
+                        .catch((err) => { showErrorToast(err) });
                     break;
 
                 case EnumRole.Agency:
                     if (!agencyId) {
-                        console.error("Agency ID bulunamadı!");
+                        showErrorToast("Agency ID bulunamadı!");
                         return;
                     }
-                    updatedData = { ...updatedData, id: agencyId }; // Agency ID ekle
-                    await agencyService.UpdateAgency(updatedData);
+                    updatedData = { ...updatedData, id: agencyId };
+                    await agencyService.UpdateAgency(updatedData)
+                        .then(() => { showSuccessToast("Tur Acentası başarıyla güncellendi.") })
+                        .catch((err) => { showErrorToast(err) });
                     break;
 
                 case EnumRole.Owner:
                     if (!ownerId) {
-                        console.error("Owner ID bulunamadı!");
+                        showErrorToast("Owner ID bulunamadı!");
                         return;
                     }
-                    updatedData = { ...updatedData, id: ownerId }; // Owner ID ekle
-                    await ownerService.UpdateOwner(updatedData);
+                    updatedData = { ...updatedData, id: ownerId };
+                    await ownerService.UpdateOwner(updatedData)
+                        .then(() => { showSuccessToast("Mekan Sahibi başarıyla güncellendi.") })
+                        .catch((err) => { showErrorToast(err) });
                     break;
 
                 default:
@@ -102,9 +110,10 @@ export default function ProfilePage() {
             setFormData(updatedData);
             localStorage.setItem('gender', updatedData.gender === 0 ? '0' : '1');
             setIsEditing(false);
-            //alert("Bilgiler başarıyla güncellendi!");
-        } catch (error) {
-            console.error("Güncelleme sırasında hata oluştu:", error);
+            showSuccessToast("Bilgiler başarıyla güncellendi.");
+        } catch (err) {
+            const errorMessage = err instanceof Error ? err.message : "Güncelleme sırasındaF hata oluştu.";
+            showErrorToast(errorMessage);
         }
     };
 
@@ -119,14 +128,14 @@ export default function ProfilePage() {
 
     const handleGenderChange = (e: SelectChangeEvent<EnumGender>) => {
         const selectedGender = e.target.value as EnumGender;
-        setGender(selectedGender);  // State'i güncelle
+        setGender(selectedGender);
         setFormData((prevData: any) => ({
             ...prevData,
-            gender: selectedGender === EnumGender.Male ? 0 : 1,  // 0 ya da 1 olarak formData'ya ekle
+            gender: selectedGender === EnumGender.Male ? 0 : 1,
         }));
         localStorage.setItem('gender', selectedGender === EnumGender.Male ? '0' : '1');
     };
-    
+
 
     const handleCancelEdit = () => {
         setIsEditing(false);

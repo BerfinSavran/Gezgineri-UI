@@ -5,6 +5,7 @@ import placeService from "../services/placeService";
 import { useAuth } from "../context/authContext";
 import { Category, Place } from "../types";
 import categoryService from "../services/categoryService";
+import { showErrorToast, showSuccessToast } from "../utils/toastHelper";
 
 export default function AddPlacePage() {
     const { user } = useAuth();
@@ -28,8 +29,9 @@ export default function AddPlacePage() {
         try {
             const fetchedCategories = await categoryService.GetAllCategories();
             setCategories(fetchedCategories);
-        } catch (error) {
-            console.error("Kategoriler alınırken hata oluştu:", error);
+        } catch (err) {
+            const errorMessage = err instanceof Error ? err.message : "Kategoriler alınırken hata oluştu.";
+            showErrorToast(errorMessage);
         }
     }
 
@@ -47,8 +49,9 @@ export default function AddPlacePage() {
         try {
             const ownerId = user?.ownerId;
             const newPlace = { ...place, ownerId };
-            await placeService.AddOrUpdatePlace(newPlace);
-            alert("Yer başarıyla eklendi!");
+            await placeService.AddOrUpdatePlace(newPlace)
+                .then(() => { showSuccessToast("Mekan başarıyla eklendi.") })
+                .catch((err) => { showErrorToast(err) });
             setPlace({
                 name: "",
                 categoryId: "",
@@ -58,9 +61,9 @@ export default function AddPlacePage() {
                 capacity: 0,
                 description: ""
             });
-        } catch (error) {
-            console.error("Yer eklenirken hata oluştu:", error);
-            alert("Yer eklenirken hata oluştu!");
+        } catch (err) {
+            const errorMessage = err instanceof Error ? err.message : "Mekan eklenirken hata oluştu.";
+            showErrorToast(errorMessage);
         }
     };
 
@@ -111,7 +114,7 @@ export default function AddPlacePage() {
                             pr: 1,
                             pb: 2,
                         }}>
-                            <TextField label="Yer Adı" variant="outlined" size="small" fullWidth name="name" value={place.name} onChange={handleInputChange} sx={{ mb: 1 }} />
+                            <TextField label="Mekan Adı" variant="outlined" size="small" fullWidth name="name" value={place.name} onChange={handleInputChange} sx={{ mb: 1 }} />
                             {/* Kategori Select */}
                             <FormControl fullWidth variant="outlined" size="small" sx={{ mb: 1 }}>
                                 <InputLabel>Kategori</InputLabel>

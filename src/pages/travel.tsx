@@ -1,20 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { Container, Typography, Tabs, Tab, Divider, Box, Card, CardContent, CardMedia, Button, TextField, Modal } from "@mui/material";
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import TravelPlanAccordion from '../components/travel/travelPlanAccordion';
 import myTravelService from '../services/myTravelService';
 import placeService from '../services/placeService';
-import { FavoritePlace, MyTravelPlan, Place } from '../types';
+import { MyTravelPlan, Place } from '../types';
 import { useAuth } from '../context/authContext';
 import favoritePlaceService from '../services/favoritePlaceService';
 import myTravelPlanService from '../services/myTravelPlanService';
+import { showErrorToast, showSuccessToast } from '../utils/toastHelper';
 
 const TravelPage: React.FC = () => {
     const navigate = useNavigate();
     const { user } = useAuth();
     const { id } = useParams();
     const [tabValue, setTabValue] = useState(0);
-    const [travelPlans, setTravelPlans] = useState<any[]>([]);  // Seyahat planları
+    const [travelPlans, setTravelPlans] = useState<any[]>([]);
     const [travel, setTravel] = useState<{ title: string; location: string; startdate: string; enddate: string } | null>(null);
     const [places, setPlaces] = useState<Place[]>([]);
     const [favoritePlaces, setFavoritePlaces] = useState<Place[]>([]);
@@ -44,8 +45,9 @@ const TravelPage: React.FC = () => {
                 const location = data.city ? `${data.country}, ${data.city}` : data.country;
                 setTravel({ title: data.name, location, startdate: data.startDate, enddate: data.endDate });
             }
-        } catch (error) {
-            console.error("Seyahat detayları getirilirken hata oluştu:", error);
+        } catch (err) {
+            const errorMessage = err instanceof Error ? err.message : "Seyahat detayları getirilirken hata oluştu.";
+            showErrorToast(errorMessage);
         }
     };
 
@@ -68,8 +70,9 @@ const TravelPage: React.FC = () => {
                 }
                 setFavoritePlaces(favoritePlacesList);
             }
-        } catch (error) {
-            console.error("Seyahat detayları getirilirken hata oluştu:", error);
+        } catch (err) {
+            const errorMessage = err instanceof Error ? err.message : "Seyahat detayları getirilirken hata oluştu.";
+            showErrorToast(errorMessage);
         }
     };
 
@@ -79,33 +82,34 @@ const TravelPage: React.FC = () => {
                 const plans = await myTravelPlanService.GetTravelPlansByTravelId(id);
                 setTravelPlans(plans);
             }
-        } catch (error) {
-            console.error("Seyahat planları alınırken hata oluştu:", error);
+        } catch (err) {
+            const errorMessage = err instanceof Error ? err.message : "Seyahat planları alınırken hata oluştu.";
+            showErrorToast(errorMessage);
         }
     };
 
     const removeTravelPlan = async (planId: string) => {
         try {
             await myTravelPlanService.DeleteTravelPlan(planId);
-            alert("Seyahat planı çıkarıldı.");
+            showErrorToast("Seyahat planı çıkarıldı.");
             fetchTravelPlans();
-        } catch (error) {
-            console.error("Seyahat planı silinirken hata oluştu:", error);
+        } catch (err) {
+            const errorMessage = err instanceof Error ? err.message : "Seyahat planı silinirken hata oluştu.";
+            showErrorToast(errorMessage);
         }
     };
 
     const handleSaveDate = async () => {
         if (!id) {
-            console.error("Seyahat ID'si bulunamadı.");
+            showErrorToast("Seyahat ID'si bulunamadı.");
             return;
         }
 
         if (!selectedDate || !selectedPlace) {
-            console.error("Lütfen bir tarih ve mekan seçin.");
+            showErrorToast("Lütfen bir tarih ve mekan seçin.");
             return;
         }
 
-        // Tarih aralığını kontrol et
         if (travel?.startdate && travel?.enddate) {
             const selected = new Date(selectedDate);
             const start = new Date(travel.startdate);
@@ -116,7 +120,7 @@ const TravelPage: React.FC = () => {
             selected.setHours(0, 0, 0, 0);
 
             if (selected < start || selected > end) {
-                alert("Seçtiğiniz tarih, seyahat tarih aralığının dışında! Lütfen geçerli bir tarih seçin.");
+                showErrorToast("Seçtiğiniz tarih, seyahat tarih aralığının dışında! Lütfen geçerli bir tarih seçin.");
                 return;
             }
         }
@@ -132,6 +136,7 @@ const TravelPage: React.FC = () => {
                     city: selectedPlace.city,
                     id: existingPlan?.id,
                 });
+                showSuccessToast("Başarıyla güncellendi.");
             }
             else {
                 await myTravelPlanService.AddOrUpdateTravelPlan({
@@ -140,17 +145,19 @@ const TravelPage: React.FC = () => {
                     date: selectedDate,
                     city: selectedPlace.city,
                 });
+                showSuccessToast("Başarıyla eklendi.");
             }
 
             setTravelPlans((prev) =>
                 prev.map((plan) => (plan.id === id ? { ...plan, date: selectedDate } : plan))
             );
 
-            alert("Seyahat planı başarıyla kaydedildi.");
+            showSuccessToast("Seyahat planı başarıyla kaydedildi.");
             handleCloseModal();
             fetchTravelPlans();
-        } catch (error) {
-            console.error("Tarih kaydedilirken hata oluştu:", error);
+        } catch (err) {
+            const errorMessage = err instanceof Error ? err.message : "Tarih kaydedilirken hata oluştu.";
+            showErrorToast(errorMessage);
         }
     };
 
@@ -164,13 +171,12 @@ const TravelPage: React.FC = () => {
 
     const handleOpenModal = (place: Partial<Place>, existingPlan?: MyTravelPlan) => {
         setSelectedPlace(place);
-        console.log(existingPlan)
         if (existingPlan) {
-            const date = new Date(existingPlan.date); // existingPlan tarihini al
-            const formattedDate = date.toISOString().split('T')[0]; // 'yyyy-mm-dd' formatına çevir
-            setSelectedDate(formattedDate);  // Mevcut tarihe göre selectedDate'i güncelle
+            const date = new Date(existingPlan.date);
+            const formattedDate = date.toISOString().split('T')[0]; // 'yyyy-mm-dd' 
+            setSelectedDate(formattedDate);
         } else {
-            setSelectedDate(''); // Yeni bir plan ekliyorsanız tarih boş kalsın
+            setSelectedDate('');
         }
         setOpenModal(true);
     };

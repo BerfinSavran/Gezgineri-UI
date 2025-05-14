@@ -23,7 +23,7 @@ const Sidebar = () => {
 
   const handleLogout = () => {
     logout();
-    navigate('/'); // veya giriş sayfan hangisiyse
+    navigate('/');
   };
 
   return (
@@ -37,7 +37,7 @@ const Sidebar = () => {
             boxSizing: 'border-box',
             display: 'flex',
             flexDirection: 'column',
-            justifyContent: 'space-between', // Çıkışı alta ittirmek için
+            justifyContent: 'space-between',
           },
         }}
         variant="permanent"

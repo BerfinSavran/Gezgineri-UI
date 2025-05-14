@@ -5,6 +5,7 @@ import { useAuth } from "../context/authContext";
 import { Container } from "@mui/material";
 import Card from "../components/card"
 import tourService from "../services/tourService";
+import { showErrorToast, showSuccessToast } from "../utils/toastHelper";
 
 function ApprovalTours() {
     const { user } = useAuth();
@@ -26,8 +27,9 @@ function ApprovalTours() {
         try {
             const data = await tourService.GetToursByAgencyIdWithInclude(user?.agencyId);
             setToursforAgency(data);
-        } catch (error) {
-            console.error("Error fetching tours:", error);
+        } catch (err) {
+            const errorMessage = err instanceof Error ? err.message : "Turlar alınırken hata oluştu.";
+            showErrorToast(errorMessage);
         }
     };
 
@@ -36,8 +38,9 @@ function ApprovalTours() {
         try {
             const data = await tourService.GetAllWithInclude();
             setTours(data);
-        } catch (error) {
-            console.error("Error fetching tours:", error);
+        } catch (err) {
+            const errorMessage = err instanceof Error ? err.message : "Turlar alınırken hata oluştu.";
+            showErrorToast(errorMessage);
         }
     };
 
@@ -64,12 +67,14 @@ function ApprovalTours() {
                 status: 1
             };
 
-            await tourService.AddOrUpdateTour(updatedTour);
+            await tourService.AddOrUpdateTour(updatedTour)
+                .then(() => { showSuccessToast("Tur başarıyla onaylandı.") })
+                .catch((err) => { showErrorToast(err) });
 
             setTours(prev => prev.map(tour => tour.id === updatedTour.id ? updatedTour : tour));
-            console.log("Tur başarıyla onaylandı:", updatedTour);
-        } catch (error) {
-            console.error("Onaylama sırasında hata oluştu:", error);
+        } catch (err) {
+            const errorMessage = err instanceof Error ? err.message : "Onaylama sırasında hata oluştu.";
+            showErrorToast(errorMessage);
         }
     };
 
@@ -80,12 +85,14 @@ function ApprovalTours() {
                 status: 2
             };
 
-            await tourService.AddOrUpdateTour(updatedTour);
+            await tourService.AddOrUpdateTour(updatedTour)
+                .then(() => { showSuccessToast("Tur başarıyla reddedildi.") })
+                .catch((err) => { showErrorToast(err) });
 
             setTours(prev => prev.map(tour => tour.id === updatedTour.id ? updatedTour : tour));
-            console.log("Tur başarıyla reddeildi:", updatedTour);
-        } catch (error) {
-            console.error("Reddetme sırasında hata oluştu:", error);
+        } catch (err) {
+            const errorMessage = err instanceof Error ? err.message : "Reddetme sırasında hata oluştu.";
+            showErrorToast(errorMessage);
         }
     };
 

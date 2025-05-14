@@ -18,6 +18,7 @@ import TourDetailsPage from './pages/tourDetails';
 import Sidebar from './components/sideBar';
 import AdminDashboard from './pages/adminDashboard';
 import { Box } from '@mui/material';
+import Categories from './pages/categories';
 
 
 function App() {
@@ -58,6 +59,8 @@ function AppContent() {
           <Route path='/approvalPlaces' element={<ApprovalPlacesPage />} />
           <Route path='/approvalTours' element={<ApprovalToursPage />} />
           <Route path='/adminDashboard' element={<AdminDashboard />} />
+          <Route path='/categories' element={<Categories />} />
+
         </Routes>
       </Box>
     </div>

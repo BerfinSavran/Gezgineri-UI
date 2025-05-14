@@ -3,7 +3,7 @@ import SearchIcon from '@mui/icons-material/Search';
 
 
 interface SearchProps {
-    onSearch: (value: string) => void; // Arama yaparken çağrılacak fonksiyon
+    onSearch: (value: string) => void;
 }
 
 const SearchContainer = styled('div')(({ theme }) => ({

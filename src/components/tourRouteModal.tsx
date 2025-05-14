@@ -2,13 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Stack } from '@mui/material';
 import { TourRoute } from '../types';
 import tourRouteService from '../services/tourRouteService';
+import { showErrorToast, showSuccessToast } from '../utils/toastHelper';
 
 export default function TourRouteModal({
     open,
     handleClose,
     tourId,
     initialData = null,
-    onRouteUpdated,  // Opsiyonel hale getirdik, varsayılan olarak null
+    onRouteUpdated,
 }: {
     open: boolean;
     handleClose: () => void;
@@ -25,19 +26,18 @@ export default function TourRouteModal({
         imageUrl: '',
     });
 
-    // Eğer modal düzenleme için açılmışsa, formData'yı initialData ile güncelle
     useEffect(() => {
         if (initialData) {
             setFormData({
                 ...initialData,
-                date: initialData.date ? new Date(initialData.date + "Z").toISOString().split('T')[0] : "", // Tarihi string formatına çevir
+                date: initialData.date ? new Date(initialData.date + "Z").toISOString().split('T')[0] : "",
             });
         } else {
             setFormData({
                 tourId,
                 location: '',
                 order: 1,
-                date: new Date().toISOString().split('T')[0], // Yeni tarih eklerken formatlı olsun
+                date: new Date().toISOString().split('T')[0],
                 description: '',
                 imageUrl: '',
             });
@@ -55,27 +55,25 @@ export default function TourRouteModal({
     const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData((prevData) => ({
             ...prevData,
-            date: e.target.value, // `type="date"` input zaten `YYYY-MM-DD` string formatında verir
+            date: e.target.value,
         }));
     };
 
     const handleSaveClick = async () => {
         try {
-            // Backend'e id'yi göndermiyoruz çünkü backend id'yi oluşturacak.
             const { id, ...dataToSave } = formData;
             if (id) {
-                // Eğer id varsa, güncelleme yapılır
-                await tourRouteService.AddOrUpdateTourRoute({...dataToSave, id});
-                alert('Rota başarıyla güncellendi!');
+                await tourRouteService.AddOrUpdateTourRoute({ ...dataToSave, id });
+                showSuccessToast('Rota başarıyla güncellendi!');
                 onRouteUpdated?.();
             } else {
                 await tourRouteService.AddOrUpdateTourRoute(dataToSave);
-                alert('Tur rotası başarıyla eklendi!');
+                showSuccessToast('Tur rotası başarıyla eklendi!');
             }
             handleClose();
-        } catch (error) {
-            console.error('Hata oluştu:', error);
-            alert('Tur rotası eklenirken hata oluştu!');
+        } catch (err) {
+            const errorMessage = err instanceof Error ? err.message : "Tur rotası kaydedilirken hata oluştu.";
+            showErrorToast(errorMessage);
         }
     };
 
@@ -103,7 +101,7 @@ export default function TourRouteModal({
                         label="Tarih"
                         name="date"
                         type="date"
-                        value={formData.date} // Date'i doğru formatta veriyoruz
+                        value={formData.date}
                         onChange={handleDateChange}
                         fullWidth
                         InputLabelProps={{

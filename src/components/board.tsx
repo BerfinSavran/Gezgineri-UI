@@ -49,7 +49,6 @@ function Board({
       <TopContents
         hasNewRecordButton={hasNewRecordButton}
         newRecordButtonOnClick={newRecordButtonOnClick}
-        dataTarget={newRecordModalDataTarget}
         leftContent={leftTopContent}
         rightContent={rightTopContent}
       />

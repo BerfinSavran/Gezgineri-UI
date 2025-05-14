@@ -1,18 +1,19 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { Container, Accordion, AccordionSummary, AccordionDetails, Typography, Card, CardMedia, CardContent, Stack, Button } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { EnumRole, TourRoute } from "../types";
 import tourRouteService from "../services/tourRouteService";
-import TourRouteModal from "../components/tourRouteModal"; // Modal bileşenini içeri aktar
+import TourRouteModal from "../components/tourRouteModal";
 import { useAuth } from "../context/authContext";
+import { showErrorToast } from "../utils/toastHelper";
 
 export default function TourDetailsPage() {
     const { id } = useParams();
     const { user } = useAuth();
     const [routes, setRoutes] = useState<TourRoute[]>([]);
-    const [open, setOpen] = useState(false); // Modal açma durumu
-    const [selectedRoute, setSelectedRoute] = useState<TourRoute | null>(null); // Seçili rota
+    const [open, setOpen] = useState(false);
+    const [selectedRoute, setSelectedRoute] = useState<TourRoute | null>(null);
 
     useEffect(() => {
         fetchTourRoutes();
@@ -31,13 +32,14 @@ export default function TourDetailsPage() {
                 });
                 setRoutes(sortedRoutes);
             }
-        } catch (error) {
-            console.error("Error fetching tour routes:", error);
+        } catch (err) {
+            const errorMessage = err instanceof Error ? err.message : "Tur rotaları alınırken hata oluştu.";
+            showErrorToast(errorMessage);
         }
     };
 
     const groupedRoutes = routes.reduce((acc, route) => {
-        const dateKey = new Date(route.date).toLocaleDateString("tr-TR"); // Tarihi yerel formata çeviriyoruz
+        const dateKey = new Date(route.date).toLocaleDateString("tr-TR");
         if (!acc[dateKey]) acc[dateKey] = [];
         acc[dateKey].push(route);
         return acc;
@@ -51,17 +53,17 @@ export default function TourDetailsPage() {
 
     const handleDelete = async (routeId: string) => {
         if (!routeId) {
-            console.error("Silinecek rotanın ID'si bulunamadı.");
+            showErrorToast("Silinecek rotanın ID'si bulunamadı.");
             return;
         }
         try {
-            // doğru rota ID'sini kullanıyoruz
             await tourRouteService.DeleteTourRoute(routeId);
-            alert("Rota başarıyla silindi");
-            fetchTourRoutes(); // Rotaları tekrar yükleyelim
+            showErrorToast("Rota başarıyla silindi");
+            fetchTourRoutes();
         }
-        catch (error) {
-            console.error("Rota silinirken hata oluştu:", error);
+        catch (err) {
+            const errorMessage = err instanceof Error ? err.message : "Rota silinirken hata oluştu.";
+            showErrorToast(errorMessage);
         }
     };
 
@@ -72,7 +74,7 @@ export default function TourDetailsPage() {
     };
 
     const handleUpdateRoutes = () => {
-        fetchTourRoutes();  // Modal kapandıktan sonra rotaları yeniden alıyoruz
+        fetchTourRoutes();
     };
 
 

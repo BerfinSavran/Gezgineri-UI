@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Grid, Card, CardContent, Typography, Divider, Stack } from '@mui/material';
+import { Container, Card, CardContent, Typography, Divider, Stack } from '@mui/material';
 import { useAuth } from '../context/authContext';
 import placeService from '../services/placeService';
 import tourService from '../services/tourService';
@@ -8,6 +8,7 @@ import travelerService from '../services/travelerService';
 import agencyService from '../services/agencyService';
 import ownerService from '../services/ownerService';
 import { EnumStatus } from '../types';
+import { showErrorToast } from '../utils/toastHelper';
 
 const AdminDashboard = () => {
   const { user } = useAuth();
@@ -29,8 +30,9 @@ const AdminDashboard = () => {
     try {
       const data = await memberService.GetAllMembers();
       setTotalParticipants(data.length);
-    } catch (error) {
-      console.error("Error fetching members:", error);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Kullanıcılar alınırken hata oluştu.";
+      showErrorToast(errorMessage);
     }
   };
 
@@ -44,37 +46,40 @@ const AdminDashboard = () => {
         agency: agencies.length,
         owner: owners.length,
       });
-    } catch (error) {
-      console.error("Error fetching roles: ", error);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Roller alınırken hata oluştu.";
+      showErrorToast(errorMessage);
     }
   };
 
   const fetchPlaces = async () => {
     try {
       const data = await placeService.GetAllPlaces();
-  
+
       const pending = data.filter((place: any) => place.status === EnumStatus.Pending);
       const approved = data.filter((place: any) => place.status === EnumStatus.Approved);
       setPlaces(approved.length);
       setPendingPlaces(pending.length);
-    } catch (error) {
-      console.error("Error fetching places: ", error);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Mekanlar alınırken hata oluştu.";
+      showErrorToast(errorMessage);
     }
   };
-  
+
   const fetchTours = async () => {
     try {
       const data = await tourService.GetAllWithInclude();
-  
+
       const pending = data.filter((tour: any) => tour.status === EnumStatus.Pending);
       const approved = data.filter((tour: any) => tour.status === EnumStatus.Approved);
       setTours(approved.length);
       setPendingTours(pending.length);
-    } catch (error) {
-      console.error("Error fetching tours: ", error);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Turlar alınırken hata oluştu.";
+      showErrorToast(errorMessage);
     }
   };
-  
+
   return (
     <Container maxWidth="lg" sx={{ mt: 10, ml: 15 }}>
       <Card>

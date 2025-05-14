@@ -5,7 +5,6 @@ const axiosInstance = axios.create({
   baseURL: 'https://localhost:7033/api/',
 });
 
-// Tüm isteklerde `Authorization` başlığına token ekle
 axiosInstance.interceptors.request.use((config) => {
   const token = AuthService.getToken();
   if (token) {

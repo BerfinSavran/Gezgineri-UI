@@ -4,11 +4,12 @@ import CloseIcon from '@mui/icons-material/Close';
 import myTravelService from '../../services/myTravelService';
 import { MyTravel } from '../../types';
 import { useAuth } from '../../context/authContext';
+import { showErrorToast, showSuccessToast } from '../../utils/toastHelper';
 
 interface NewTravelDialogProps {
     open: boolean;
     onClose: () => void;
-    onTravelAdded: () => void; // Yeni seyahat eklenince bu fonksiyon çağrılacak
+    onTravelAdded: () => void;
 }
 
 const NewTravelDialog: React.FC<NewTravelDialogProps> = ({ open, onClose, onTravelAdded }) => {
@@ -37,12 +38,12 @@ const NewTravelDialog: React.FC<NewTravelDialogProps> = ({ open, onClose, onTrav
     const handleAddMyTravel = async () => {
         try {
             const response = await myTravelService.AddOrUpdateMyTravel(myTravel);
-            alert("Seyahat başarıyla eklendi.");
-            onTravelAdded(); // Seyahat başarıyla eklendiğinde listeyi güncelle
+            showSuccessToast("Seyahat başarıyla eklendi.");
+            onTravelAdded();
             onClose();
-        } catch (error) {
-            console.error("Seyahat eklenirken hata oluştu:", error);
-            alert("Seyahat eklenirken hata oluştu!");
+        } catch (err) {
+            const errorMessage = err instanceof Error ? err.message : "Seyahat eklenirken hata oluştu.";
+            showErrorToast(errorMessage);
         }
     };
 

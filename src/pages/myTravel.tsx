@@ -9,6 +9,7 @@ import myTravelService from "../services/myTravelService";
 import { MyTravel } from "../types";
 import { useAuth } from "../context/authContext";
 import ConfirmDeleteDialog from "../components/confirmDeleteDialog";
+import { showErrorToast } from "../utils/toastHelper";
 
 export default function MyTravelPage() {
     const { user } = useAuth();
@@ -20,45 +21,46 @@ export default function MyTravelPage() {
 
     useEffect(() => {
         fetchMyTravels();
-    }, [user?.travelerId]); // user?.travelerId değiştiğinde tetiklenecek
+    }, [user?.travelerId]);
 
     const fetchMyTravels = async () => {
         try {
-            if (!user?.travelerId) return; // Eğer travelerId yoksa, sorgu yapma
+            if (!user?.travelerId) return;
             const data = await myTravelService.GetMyTravelsByTravelerId(user?.travelerId);
             setMyTravels(data);
-        } catch (error) {
-            console.error("Seyahatler getirilirken hata oluştu:", error);
+        } catch (err) {
+            const errorMessage = err instanceof Error ? err.message : "Seyahatler getirilirken hata oluştu.";
+            showErrorToast(errorMessage);
         }
     };
 
     const handleTravelClick = (mytravel: MyTravel) => {
-        navigate(`/travel/${mytravel.id}`); // Doğrudan ID ile yönlendirme yap
+        navigate(`/travel/${mytravel.id}`);
     };
 
     const handleTravelAdded = () => {
-        fetchMyTravels(); // Seyahat eklendikten sonra listeyi güncelle
+        fetchMyTravels();
     };
 
     const handleDeleteDialogOpen = (travelId: string) => {
-        setSelectedTravelId(travelId); // Silinecek seyahatin ID'sini sakla
+        setSelectedTravelId(travelId);
         setDeleteDialogOpen(true);
     };
 
     const handleDeleteDialogClose = () => {
-        setDeleteDialogOpen(false); // Modal'ı kapat
-        setSelectedTravelId(null); // ID'yi temizle
+        setDeleteDialogOpen(false);
+        setSelectedTravelId(null);
     };
 
     const handleTravelDelete = async () => {
         if (selectedTravelId) {
             try {
-                await myTravelService.DeleteMyTravel(selectedTravelId); // Silme API çağrısı
-                fetchMyTravels(); // Seyahatleri güncelle
-                handleDeleteDialogClose(); // Modal'ı kapat
-            } catch (error) {
-                console.error("Seyahat silinirken hata oluştu:", error);
-                alert("Silme işlemi başarısız oldu.");
+                await myTravelService.DeleteMyTravel(selectedTravelId);
+                fetchMyTravels();
+                handleDeleteDialogClose();
+            } catch (err) {
+                const errorMessage = err instanceof Error ? err.message : "Seyahat silinirken hata oluştu.";
+                showErrorToast(errorMessage);
             }
         }
     };
@@ -108,7 +110,7 @@ export default function MyTravelPage() {
                                 <Stack direction="row" spacing={1}>
                                     {/* Gör Butonu */}
                                     <IconButton
-                                        onClick={() => handleTravelClick(mytravel)} // Seyahati gör
+                                        onClick={() => handleTravelClick(mytravel)}
                                         color="primary"
                                     >
                                         <VisibilityIcon />

@@ -5,6 +5,7 @@ import { Tour } from "../types";
 import tourService from "../services/tourService";
 import { useAuth } from "../context/authContext";
 import { useNavigate } from "react-router-dom";
+import { showErrorToast } from "../utils/toastHelper";
 
 export default function ToursPage() {
     const [tours, setTours] = useState<Tour[]>([]);
@@ -20,14 +21,14 @@ export default function ToursPage() {
             const data = await tourService.GetToursStartingFromToday();
             const approvedTours = data.filter((tour: Tour) => tour.status === 1);
             setTours(approvedTours);
-        } catch (error) {
-            console.error("Error fetching tours:", error);
-            alert("Error fetching tours.");
+        } catch (err) {
+            const errorMessage = err instanceof Error ? err.message : "Turlar alınırken hata oluştu.";
+            showErrorToast(errorMessage);
         }
     }
 
     const handleTourClick = (tourId: string) => {
-        navigate(`/tour/id/${tourId}`);  // ID'yi kullanarak ilgili tura yönlendirme yap
+        navigate(`/tour/id/${tourId}`);
     }
 
     const formatDateForTypography = (dateString: string | undefined) => {
@@ -46,12 +47,12 @@ export default function ToursPage() {
                             key={tour.id}
                             sx={{
                                 width: "100%",
-                                height: "auto", // Kartın minimum yüksekliğini ayarlayalım
+                                height: "auto",
                                 border: "1px solid",
                                 padding: 2,
                                 display: 'flex',
                                 flexDirection: 'column',
-                                justifyContent: 'space-between', // İçeriği alt ve üst arasında paylaştırır
+                                justifyContent: 'space-between',
                                 overflow: 'hidden',
                             }}
                             onClick={() => handleTourClick(tour.id)}

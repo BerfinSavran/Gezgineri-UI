@@ -1,9 +1,10 @@
 
-import { TextareaAutosize, Container, Typography, Stack, Box, TextField, Card, Button, FormControl, InputLabel, Select, MenuItem, SelectChangeEvent } from "@mui/material";
+import { TextareaAutosize, Container, Typography, Stack, Box, TextField, Card, Button } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/authContext";
 import { Tour } from "../types";
 import tourService from "../services/tourService";
+import { showErrorToast, showSuccessToast } from "../utils/toastHelper";
 
 export default function AddTourPage() {
     const { user } = useAuth();
@@ -31,8 +32,9 @@ export default function AddTourPage() {
         try {
             const agencyId = user?.agencyId;
             const newTour = { ...tour, agencyId };
-            await tourService.AddOrUpdateTour(newTour);
-            alert("Tur başarıyla eklendi!");
+            await tourService.AddOrUpdateTour(newTour)
+                .then(() => { showSuccessToast("Tur başarıyla eklendi.") })
+                .catch((err) => { showErrorToast(err) });
             setTour({
                 name: "",
                 startDate: "",
@@ -41,13 +43,11 @@ export default function AddTourPage() {
                 capacity: 0,
                 description: ""
             });
-        } catch (error) {
-            console.error("Tur eklenirken hata oluştu:", error);
-            alert("Tur eklenirken hata oluştu!");
+        } catch (err) {
+            const errorMessage = err instanceof Error ? err.message : "Tur eklenirken hata oluştu.";
+            showErrorToast(errorMessage);
         }
     };
-
-
 
     return (
         <Container maxWidth="xl">
@@ -151,7 +151,7 @@ export default function AddTourPage() {
                     </Card>
                 </Stack>
             </Card>
-            
+
         </Container>
     );
 }

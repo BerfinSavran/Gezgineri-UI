@@ -8,6 +8,7 @@ import { Place, Tour } from '../types';
 import placeService from '../services/placeService';
 import tourService from '../services/tourService';
 import { useNavigate } from 'react-router-dom';
+import { showErrorToast } from '../utils/toastHelper';
 
 export default function HomePage() {
     const { user } = useAuth();
@@ -28,15 +29,15 @@ export default function HomePage() {
         try {
             const data = await placeService.GetAllPlaces();
             if (data && Array.isArray(data)) {
-                const approvedPlaces = data.filter(place => place.status === 1); // 1 = Approved
-                setPlacesforTraveler(approvedPlaces); // Sadece dizi geldiğinde state güncelle
+                const approvedPlaces = data.filter(place => place.status === 1);
+                setPlacesforTraveler(approvedPlaces);
             } else {
-                console.error("Beklenmeyen API yanıtı:", data);
-                setPlacesforTraveler([]); // Hata durumunda boş dizi ata
+                showErrorToast("Beklenmeyen API yanıtı: Mekanlar alınamadı.");
+                setPlacesforTraveler([]);
             }
         } catch (error) {
-            console.error("Error fetching places:", error);
-            setPlacesforTraveler([]); // Hata olursa boş diziyle devam et
+            showErrorToast("Mekanlar alınırken bir hata oluştu.");
+            setPlacesforTraveler([]);
         }
     };
 
@@ -55,7 +56,7 @@ export default function HomePage() {
         description: place.description,
         country: place.country,
         city: place.city,
-        imageUrl: place.imageUrl || "fotoğraf", // Eğer görsel yoksa varsayılan resim ekle
+        imageUrl: place.imageUrl || "fotoğraf",
     })) || [];
 
 
@@ -75,10 +76,10 @@ export default function HomePage() {
         if (!user?.ownerId) return;
         try {
             const data = await placeService.GetPlacesByOwnerIdWithInclude(user?.ownerId);
-            const approvedPlaces = data.filter((place: Place) => place.status === 1); // 1 = Approved
+            const approvedPlaces = data.filter((place: Place) => place.status === 1);
             setPlacesforOwner(approvedPlaces);
         } catch (error) {
-            console.error("Error fetching places:", error);
+            showErrorToast("Mekanlar alınırken bir hata oluştu.");
         }
     };
 
@@ -89,7 +90,7 @@ export default function HomePage() {
             const approvedTours = data.filter((tour: Tour) => tour.status === 1);
             setTours(approvedTours);
         } catch (error) {
-            console.error("Error fetching tours:", error);
+            showErrorToast("Turlar yüklenirken bir hata oluştu.");
         }
     };
 
@@ -139,15 +140,15 @@ export default function HomePage() {
                                                 border: "1px solid",
                                                 display: "flex",
                                                 flexDirection: "column",
-                                                cursor: "pointer" // Kart üzerine gelindiğinde tıklanabilir olduğunu gösterir
+                                                cursor: "pointer"
                                             }}
-                                            onClick={() => handlePlaceCardClick(card.id)} // Tıklandığında yönlendir
+                                            onClick={() => handlePlaceCardClick(card.id)}
                                         >
                                             {/* Kartın Üst Kısmı: Resim */}
                                             <CardMedia
                                                 component="img"
                                                 height="200"
-                                                image={card.imageUrl || "fotoğraf"} // Eğer resim yoksa varsayılan resim göster
+                                                image={card.imageUrl || "fotoğraf"}
                                                 alt={card.title}
                                                 sx={{ objectFit: "cover" }}
                                             />
@@ -184,13 +185,13 @@ export default function HomePage() {
                                 key={tour.id}
                                 sx={{
                                     width: "100%",
-                                    height: "auto", // Kartın minimum yüksekliğini ayarlayalım
+                                    height: "auto",
                                     border: "1px solid",
                                     padding: 2,
                                     display: 'flex',
                                     flexDirection: 'column',
-                                    justifyContent: 'space-between', // İçeriği alt ve üst arasında paylaştırır
-                                    overflow: 'hidden', // Taşan içerik gizlenir
+                                    justifyContent: 'space-between',
+                                    overflow: 'hidden',
                                 }}>
                                 <Stack direction={"row"} spacing={2}>
                                     <Card sx={{
@@ -238,13 +239,13 @@ export default function HomePage() {
                                 key={place.id}
                                 sx={{
                                     width: "100%",
-                                    height: "auto", // Kartın minimum yüksekliğini ayarlayalım
+                                    height: "auto",
                                     border: "1px solid",
                                     padding: 2,
                                     display: 'flex',
                                     flexDirection: 'column',
-                                    justifyContent: 'space-between', // İçeriği alt ve üst arasında paylaştırır
-                                    overflow: 'hidden', // Taşan içerik gizlenir
+                                    justifyContent: 'space-between',
+                                    overflow: 'hidden',
                                 }}>
                                 <Stack direction={"row"} spacing={2}>
                                     <Card sx={{
@@ -269,8 +270,8 @@ export default function HomePage() {
                                     </Card>
                                     <Stack direction={"column"} spacing={"8px"}>
                                         <Typography variant="h6">Mekanın İsmi: {place.name} </Typography>
-                                        <Typography variant="body1">Lokasyonu: {place.country} </Typography>
-                                        <Typography variant="body1">Şehir: {place.city} </Typography>
+                                        <Typography variant="body1">Lokasyonu: {place.country}, {place.city} </Typography>
+                                        <Typography variant="body1">Kategori: {place.categoryName} </Typography>
                                         <Typography variant="body1">İşletmenin İsmi: {place.businessName} </Typography>
                                         <Typography variant="body1">Kapasitesi: {place.capacity} </Typography>
                                         <Typography variant="body1">Gezi Süresi: {place.visitDuration} </Typography>

@@ -10,6 +10,7 @@ import { Agency, Owner, Traveler } from "../types";
 import { useNavigate } from "react-router-dom";
 import agencyService from "../services/agencyService";
 import ownerService from "../services/ownerService";
+import { showErrorToast, showSuccessToast } from "../utils/toastHelper";
 
 export default function RegisterPage() {
     const [dialogRole, setDialogRole] = useState("");
@@ -32,7 +33,7 @@ export default function RegisterPage() {
                     password: formValues["Şifre"],
                 };
                 await travelerService.CreateTraveler(travelerData);
-                alert("Traveler registered successfully!");
+                showSuccessToast("Gezgin başarıyla kayıt oldu!");
                 navigate("/");
             }
             else if (dialogRole === "agency") {
@@ -45,9 +46,9 @@ export default function RegisterPage() {
                     licenseNumber: formValues["Lisans Numarası"],
                 };
                 await agencyService.CreateAgency(agencyData);
-                alert("Agency registered successfully!");
+                showSuccessToast("Acenta başarıyla kayıt oldu!");
                 navigate("/");
-            } 
+            }
             else if (dialogRole === "owner") {
                 const ownerData: Partial<Owner> = {
                     fullName: formValues["Ad Soyad"],
@@ -58,26 +59,26 @@ export default function RegisterPage() {
                     licenseNumber: formValues["Lisans Numarası"],
                 };
                 await ownerService.CreateOwner(ownerData);
-                alert("Owner registered successfully!");
+                showSuccessToast("Mekan Sahibi başarıyla kayıt oldu!");
                 navigate("/");
             }
             handleCloseDialog();
-        } catch (error) {
-            console.error("Registration failed:", error);
-            alert("Registration failed. Please try again.");
+        } catch (err) {
+            const errorMessage = err instanceof Error ? err.message : "Kayıt başarısız. Lütfen tekrar deneyin.";
+            showErrorToast(errorMessage);
         }
     };
 
     const roleForms: Record<string, { label: string; type?: string }[]> = {
         traveler: [
             { label: "Ad Soyad" },
-            { label: "Email" }, 
+            { label: "Email" },
             { label: "Şifre", type: "password" }
         ],
         agency: [
             { label: "Ad Soyad" },
             { label: "Şirket İsmi" },
-            { label: "Email" }, 
+            { label: "Email" },
             { label: "Şifre", type: "password" },
             { label: "Vergi Numarası" },
             { label: "Lisans Numarası" },

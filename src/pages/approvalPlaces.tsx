@@ -5,6 +5,7 @@ import { useAuth } from "../context/authContext";
 import placeService from "../services/placeService";
 import { Container } from "@mui/material";
 import Card from "../components/card"
+import { showErrorToast, showSuccessToast } from "../utils/toastHelper";
 
 function ApprovalPlaces() {
     const { user } = useAuth();
@@ -16,7 +17,6 @@ function ApprovalPlaces() {
 
         if (user.role === 0) {
             fetchAllPlacesForAdmin();
-            console.log(places);
         } else if (user.role === 3) {
             fetchPlacesforOwner();
         }
@@ -27,8 +27,9 @@ function ApprovalPlaces() {
         try {
             const data = await placeService.GetPlacesByOwnerIdWithInclude(user?.ownerId);
             setPlacesforOwner(data);
-        } catch (error) {
-            console.error("Error fetching places:", error);
+        } catch (err) {
+            const errorMessage = err instanceof Error ? err.message : "Mekanlar alınırken hata oluştu.";
+            showErrorToast(errorMessage);
         }
     };
 
@@ -36,11 +37,12 @@ function ApprovalPlaces() {
         try {
             const data = await placeService.GetAllPlaces();
             setPlaces(data);
-        } catch (error) {
-            console.error("Error fetching places:", error);
+        } catch (err) {
+            const errorMessage = err instanceof Error ? err.message : "Mekanlar alınırken hata oluştu.";
+            showErrorToast(errorMessage);
         }
     };
-    
+
 
     const renderColumn = (column: string, value: any) => {
         if (column === "status") {
@@ -49,41 +51,45 @@ function ApprovalPlaces() {
             if (value === 2) return "Rejected";
         }
 
-        return value; // Diğer sütunlar olduğu gibi yazdırılır
+        return value;
     };
 
 
     const handleApprove = async (item: Place) => {
-            try {
-                const updatedPlace = {
-                    ...item,
-                    status: 1
-                };
-    
-                await placeService.AddOrUpdatePlace(updatedPlace);
-    
-                setPlaces(prev => prev.map(place => place.id === updatedPlace.id ? updatedPlace : place));
-                console.log("Tur başarıyla onaylandı:", updatedPlace);
-            } catch (error) {
-                console.error("Onaylama sırasında hata oluştu:", error);
-            }
-        };
-    
-        const handleDeny = async (item: Place) => {
-            try {
-                const updatedPlace = {
-                    ...item,
-                    status: 2
-                };
-    
-                await placeService.AddOrUpdatePlace(updatedPlace);
-    
-                setPlaces(prev => prev.map(place => place.id === updatedPlace.id ? updatedPlace : place));
-                console.log("Tur başarıyla reddeildi:", updatedPlace);
-            } catch (error) {
-                console.error("Reddetme sırasında hata oluştu:", error);
-            }
-        };
+        try {
+            const updatedPlace = {
+                ...item,
+                status: 1
+            };
+
+            await placeService.AddOrUpdatePlace(updatedPlace)
+                .then(() => { showSuccessToast("Mekan başarıyla onaylandı.") })
+                .catch((err) => { showErrorToast(err) });
+
+            setPlaces(prev => prev.map(place => place.id === updatedPlace.id ? updatedPlace : place));
+        } catch (err) {
+            const errorMessage = err instanceof Error ? err.message : "Onaylama sırasında hata oluştu.";
+            showErrorToast(errorMessage);
+        }
+    };
+
+    const handleDeny = async (item: Place) => {
+        try {
+            const updatedPlace = {
+                ...item,
+                status: 2
+            };
+
+            await placeService.AddOrUpdatePlace(updatedPlace)
+                .then(() => { showSuccessToast("Mekan başarıyla reddedildi.") })
+                .catch((err) => { showErrorToast(err) });;
+
+            setPlaces(prev => prev.map(place => place.id === updatedPlace.id ? updatedPlace : place));
+        } catch (err) {
+            const errorMessage = err instanceof Error ? err.message : "Reddetme sırasında hata oluştu.";
+            showErrorToast(errorMessage);
+        }
+    };
 
     const isApprovable = (item: any) => {
         switch (user?.role) {

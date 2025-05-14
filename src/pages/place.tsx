@@ -8,6 +8,7 @@ import placeService from "../services/placeService";
 import { useAuth } from "../context/authContext";
 import favoritePlaceService from "../services/favoritePlaceService";
 import categoryService from "../services/categoryService";
+import { showErrorToast, showSuccessToast } from "../utils/toastHelper";
 
 export default function PlacePage() {
     const [isFavorited, setIsFavorited] = useState(false);
@@ -15,7 +16,7 @@ export default function PlacePage() {
     const navigate = useNavigate();
     const [place, setPlace] = useState<Partial<Place> | null>(null);
     const [isEditing, setIsEditing] = useState(false);
-    const [categories, setCategories] = useState<Category[]>([]); // Kategoriler için state ekledik
+    const [categories, setCategories] = useState<Category[]>([]);
     const [editedPlace, setEditedPlace] = useState<Partial<Place>>({});
     const { user } = useAuth();
 
@@ -25,13 +26,13 @@ export default function PlacePage() {
                 const data = await placeService.GetPlaceById(id);
                 setPlace(data);
                 if (data.categoryId) {
-                    // Veritabanından kategori bilgisini alabiliriz
                     const categoryData = await categoryService.GetAllCategories();
                     setCategories(categoryData);
                 }
             }
-        } catch (error) {
-            console.error("Error fetching place details:", error);
+        } catch (err) {
+            const errorMessage = err instanceof Error ? err.message : "Mekan detayları alınırken hata oluştu.";
+            showErrorToast(errorMessage);
         }
     };
 
@@ -41,8 +42,9 @@ export default function PlacePage() {
                 const isFavoritedResponse = await favoritePlaceService.CheckFavorite(user.travelerId, id);
                 setIsFavorited(isFavoritedResponse);
             }
-        } catch (error) {
-            console.error("Error checking favorite status:", error);
+        } catch (err) {
+            const errorMessage = err instanceof Error ? err.message : "Favori statüsü kontrol edilirken hata oluştu.";
+            showErrorToast(errorMessage);
         }
     };
 
@@ -59,11 +61,11 @@ export default function PlacePage() {
                 isFavorite: newFavoriteStatus
             };
 
-            // Favoriyi ekleme veya kaldırma işlemi için aynı metot kullanılacak
             await favoritePlaceService.AddOrUpdateFavoritePlace(favoritePlaceData);
-        } catch (error) {
-            console.error("Error updating favorite status:", error);
-            setIsFavorited(isFavorited); // Hata olursa state'i eski haline getir
+        } catch (err) {
+            const errorMessage = err instanceof Error ? err.message : "Favori statüsü güncellenirken hata oluştu.";
+            showErrorToast(errorMessage);
+            setIsFavorited(isFavorited);
         }
     };
 
@@ -96,10 +98,12 @@ export default function PlacePage() {
 
         try {
             const updatedPlace = await placeService.AddOrUpdatePlace(updatedPlaceData);
+            showSuccessToast("Mekan başarıyla güncellendi");
             setPlace(updatedPlace);
             setIsEditing(false);
-        } catch (error) {
-            console.error("Error saving place changes:", error);
+        } catch (err) {
+            const errorMessage = err instanceof Error ? err.message : "Mekan kaydedilirken hata oluştu.";
+            showErrorToast(errorMessage);
         }
         handleEditToggle();
         fetchPlaceDetails();
@@ -107,16 +111,19 @@ export default function PlacePage() {
 
     const handleDelete = async () => {
         if (!id) {
-            console.error("Silinecek yerin ID'si bulunamadı.");
+            showErrorToast("Silinecek yerin ID'si bulunamadı.");
             return;
         }
         try {
-            await placeService.DeletePlace(id);
-            alert("Deleted successfully");
+            await placeService.DeletePlace(id)
+            .then(()=>{showSuccessToast("Mekan başarıyla silindi.")})
+            .catch((err)=>{showErrorToast(err)});
+            
             navigate("/home");
         }
-        catch (error) {
-            console.error("Error deleting place:", error);
+        catch (err) {
+            const errorMessage = err instanceof Error ? err.message : "Mekan silinirken hata oluştu.";
+            showErrorToast(errorMessage);
         }
     };
 

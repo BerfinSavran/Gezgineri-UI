@@ -1,34 +1,38 @@
-import Button from "./button";
+import { Box, Button, Stack } from "@mui/material";
 
 interface TopContentProps {
   hasNewRecordButton?: boolean;
   newRecordButtonOnClick?: () => void;
-  dataTarget?: string;
   leftContent?: React.ReactNode;
   rightContent?: React.ReactNode;
 }
 
-function TopContents(props: TopContentProps) {
+function TopContents({
+  hasNewRecordButton,
+  newRecordButtonOnClick,
+  leftContent,
+  rightContent,
+}: TopContentProps) {
   return (
-    <div className="row mb-3">
-      <div className="col-md-6 d-flex align-items-center">
-        {props.leftContent}
-      </div>
-      <div className="col-md-6 d-flex justify-content-end align-items-center">
-        {props.rightContent}
-        {props.hasNewRecordButton && (
-          <div className="text-right">
-            <Button
-              className={"btn btn-success mb-2 mr-5 m-3"}
-              text={"Add New"}
-              isModalTrigger={true}
-              dataTarget={props.dataTarget}
-              onClick={props.newRecordButtonOnClick}
-            />
-          </div>
+    <Box
+      display="flex"
+      justifyContent="space-between"
+      alignItems="center"
+      mb={3}
+      flexWrap="wrap"
+      gap={2}
+    >
+      <Box>{leftContent}</Box>
+
+      <Stack direction="row" spacing={2} alignItems="center">
+        {rightContent}
+        {hasNewRecordButton && (
+          <Button variant="contained" color="primary" onClick={newRecordButtonOnClick}>
+            Ekle
+          </Button>
         )}
-      </div>
-    </div>
+      </Stack>
+    </Box>
   );
 }
 
