@@ -176,22 +176,23 @@ export default function HomePage() {
 											justifyContent: 'space-between',
 											overflow: 'hidden',
 										}}>
-										<Stack direction={"row"} spacing={2}>
-											<Card sx={{
-												width: "300px",
-												height: "190px",
-												border: "1px solid",
-												color: "gray",
-												justifyContent: "center",
-												alignItems: "center",
-												display: "flex",
-
-											}}>
+										<Stack direction={"row"} spacing={2} alignItems="stretch">
+											<Card
+												sx={{
+													width: "300px",
+													height: "100%",  // yanındaki stack'e göre yüksekliği uzatıyoruz
+													border: "1px solid",
+													color: "gray",
+													justifyContent: "center",
+													alignItems: "center",
+													display: "flex",
+												}}
+											>
 												{place.imageUrl ? (
 													<img
 														src={place.imageUrl}
 														alt={place.name}
-														style={{ width: "100%", height: "100%", objectFit: "cover" }}
+														style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
 													/>
 												) : (
 													"Fotoğraf"

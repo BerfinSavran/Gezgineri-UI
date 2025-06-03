@@ -88,6 +88,8 @@ export interface Traveler {
     entryPrice?: number;
     capacity?: number;
     status: EnumStatus;
+    latitude: number;
+    longitude: number;
     approvedById: string | null;
   }
   

@@ -10,6 +10,7 @@ import favoritePlaceService from "../services/favoritePlaceService";
 import categoryService from "../services/categoryService";
 import { showErrorToast, showSuccessToast } from "../utils/toastHelper";
 import ConfirmDeleteDialog from "../components/confirmDeleteDialog";
+import PlaceMapViewer from "../components/PlaceMapViewer";
 
 export default function PlacePage() {
     const [isFavorited, setIsFavorited] = useState(false);
@@ -97,6 +98,8 @@ export default function PlacePage() {
             city: editedPlace.city || place?.city,
             imageUrl: editedPlace.imageUrl || place?.imageUrl,
             status: place?.status,
+            latitude: editedPlace.latitude || place?.latitude,
+            longitude: editedPlace.longitude || place?.longitude,
         };
 
         try {
@@ -155,11 +158,16 @@ export default function PlacePage() {
         e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
     ) => {
         const { name, value } = e.target;
+
         setEditedPlace((prevState) => ({
             ...prevState,
-            [name]: value,
+            [name]:
+                name === "latitude" || name === "longitude"
+                    ? parseFloat(value)
+                    : value,
         }));
     };
+
 
     const handleCategoryChange = (event: SelectChangeEvent<string>) => {
         setPlace((prev) => ({ ...prev, categoryId: event.target.value }));
@@ -343,6 +351,27 @@ export default function PlacePage() {
                                             minHeight: "60px"
                                         }} />
                                     <TextField
+                                        label="Enlem (Latitude)"
+                                        variant="outlined"
+                                        size="small"
+                                        fullWidth
+                                        name="latitude"
+                                        value={editedPlace.latitude ?? place.latitude ?? ""}
+                                        onChange={handleInputChange}
+                                        sx={{ mb: 1 }}
+                                    />
+                                    <TextField
+                                        label="Boylam (Longitude)"
+                                        variant="outlined"
+                                        size="small"
+                                        fullWidth
+                                        name="longitude"
+                                        value={editedPlace.longitude ?? place.longitude ?? ""}
+                                        onChange={handleInputChange}
+                                        sx={{ mb: 1 }}
+                                    />
+
+                                    <TextField
                                         label="Fotoğraf URL"
                                         variant="outlined"
                                         size="small"
@@ -387,6 +416,14 @@ export default function PlacePage() {
 
                 </Stack>
             </Card>
+            {!isEditing && place.latitude && place.longitude && (
+                <Box sx={{ mt: 4 }}>
+                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1 }}>
+                        Harita Üzerinde Konum:
+                    </Typography>
+                    <PlaceMapViewer place={place as Place} />
+                </Box>
+            )}
             <ConfirmDeleteDialog
                 open={openDialog}
                 onClose={handleDialogClose}

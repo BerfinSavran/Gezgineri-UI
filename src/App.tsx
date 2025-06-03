@@ -21,6 +21,7 @@ import { Box } from '@mui/material';
 import Categories from './pages/categories';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import 'leaflet/dist/leaflet.css';
 
 
 function App() {

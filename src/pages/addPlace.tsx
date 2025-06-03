@@ -6,6 +6,7 @@ import { useAuth } from "../context/authContext";
 import { Category, Place } from "../types";
 import categoryService from "../services/categoryService";
 import { showErrorToast, showSuccessToast } from "../utils/toastHelper";
+import PlaceMapPicker from "../components/PlaceMapPicker";
 
 export default function AddPlacePage() {
     const { user } = useAuth();
@@ -17,7 +18,9 @@ export default function AddPlacePage() {
         city: "",
         entryPrice: 0,
         capacity: 0,
-        description: ""
+        description: "",
+        latitude: undefined,
+        longitude: undefined,
     });
 
 
@@ -59,12 +62,17 @@ export default function AddPlacePage() {
                 city: "",
                 entryPrice: 0,
                 capacity: 0,
-                description: ""
+                description: "",
+                imageUrl:""
             });
         } catch (err) {
             const errorMessage = err instanceof Error ? err.message : "Mekan eklenirken hata oluştu.";
             showErrorToast(errorMessage);
         }
+    };
+
+    const handlePositionChange = (lat: number, lng: number) => {
+        setPlace((prev) => ({ ...prev, latitude: lat, longitude: lng }));
     };
 
     return (
@@ -143,9 +151,17 @@ export default function AddPlacePage() {
                                 resize: "vertical",
                                 minHeight: "60px"
                             }} />
+                            <TextField label="Fotoğraf URL" variant="outlined" size="small" fullWidth name="imageUrl" value={place.imageUrl} onChange={handleInputChange} sx={{ mb: 1 }}/>
                         </Box>
                     </Card>
                 </Stack>
+            </Card>
+            <Card sx={{ marginTop: 2, height: 400 }}>
+                <PlaceMapPicker
+                    latitude={place.latitude}
+                    longitude={place.longitude}
+                    onPositionChange={handlePositionChange}
+                />
             </Card>
         </Container>
     );

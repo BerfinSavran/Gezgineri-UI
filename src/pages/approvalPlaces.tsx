@@ -52,7 +52,7 @@ function ApprovalPlaces() {
             switch (value) {
                 case 0:
                     text = "Pending";
-                    color = "#999"; // Gri
+                    color = "orange";
                     break;
                 case 1:
                     text = "Approved";
@@ -161,7 +161,9 @@ function ApprovalPlaces() {
                             "visitDuration",
                             "entryPrice",
                             "capacity",
-                            "approvedById"
+                            "approvedById",
+                            "latitude",
+                            "longitude"
                         ]}
                         renderColumn={renderColumn}
                         hideActions={user?.role === 3 ? "true" : "false"}
