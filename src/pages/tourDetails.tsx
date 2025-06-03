@@ -109,14 +109,19 @@ export default function TourDetailsPage() {
                                             image={route.imageUrl || "https://via.placeholder.com/200"}
                                             alt={route.location}
                                         />
-                                        <CardContent>
-                                            <Stack direction="row" spacing={85} alignItems="center">
-                                                <Stack>
-                                                    <Typography variant="h6">{route.location}</Typography>
-                                                    <Typography variant="body1">{route.description}</Typography>
+                                        <CardContent sx={{ flex: 1 }}>
+                                            <Stack direction="row" justifyContent="space-between" alignItems="center">
+                                                {/* Sol: Başlık ve Açıklama */}
+                                                <Stack spacing={1} sx={{ flex: 1, pr: 2 }}>
+                                                    <Typography variant="h6" noWrap>{route.location}</Typography>
+                                                    <Typography variant="body1" sx={{ wordBreak: 'break-word' }}>
+                                                        {route.description}
+                                                    </Typography>
                                                 </Stack>
-                                                {isAgency &&
-                                                    <Stack direction="row" spacing={1}>
+
+                                                {/* Sağ: Butonlar */}
+                                                {isAgency && (
+                                                    <Stack direction="row" spacing={1} sx={{ flexShrink: 0 }}>
                                                         <Button variant="outlined" onClick={() => handleEditRoute(route)}>Düzenle</Button>
                                                         <Button
                                                             variant="outlined"
@@ -126,9 +131,10 @@ export default function TourDetailsPage() {
                                                             Sil
                                                         </Button>
                                                     </Stack>
-                                                }
+                                                )}
                                             </Stack>
                                         </CardContent>
+
                                     </Card>
                                 ))}
                             </Stack>

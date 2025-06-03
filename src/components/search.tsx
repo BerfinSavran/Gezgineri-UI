@@ -53,16 +53,18 @@ const Search: React.FC<SearchProps> = ({ onSearch }) => {
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         onSearch(event.target.value);
     };
-    return(
+    
+    return (
         <SearchContainer>
-                        <SearchIconWrapper>
-                            <SearchIcon />
-                        </SearchIconWrapper>
-                        <StyledInputBase
-                            placeholder="Search…"
-                            inputProps={{ 'aria-label': 'search' }}
-                        />
-                    </SearchContainer>
+            <SearchIconWrapper>
+                <SearchIcon />
+            </SearchIconWrapper>
+            <StyledInputBase
+                placeholder="Search…"
+                inputProps={{ 'aria-label': 'search' }}
+                onChange={handleChange}
+            />
+        </SearchContainer>
     );
 };
 

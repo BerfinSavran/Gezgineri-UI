@@ -3,7 +3,7 @@ import { Place } from "../types";
 import Board from "../components/board";
 import { useAuth } from "../context/authContext";
 import placeService from "../services/placeService";
-import { Container } from "@mui/material";
+import { Container, Typography } from "@mui/material";
 import Card from "../components/card"
 import { showErrorToast, showSuccessToast } from "../utils/toastHelper";
 
@@ -46,9 +46,28 @@ function ApprovalPlaces() {
 
     const renderColumn = (column: string, value: any) => {
         if (column === "status") {
-            if (value === 0) return "Pending";
-            if (value === 1) return "Approved";
-            if (value === 2) return "Rejected";
+            let text = "";
+            let color = "";
+
+            switch (value) {
+                case 0:
+                    text = "Pending";
+                    color = "#999"; // Gri
+                    break;
+                case 1:
+                    text = "Approved";
+                    color = "green";
+                    break;
+                case 2:
+                    text = "Rejected";
+                    color = "red";
+                    break;
+                default:
+                    text = "Bilinmiyor";
+                    color = "#333";
+            }
+
+            return <span style={{ color, fontWeight: 500 }}>{text}</span>;
         }
 
         return value;

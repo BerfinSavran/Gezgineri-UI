@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { Category } from "../types";
 import categoryService from "../services/categoryService";
-import { Button, Container } from "@mui/material";
+import { Button, Container, Stack } from "@mui/material";
 import Board from "../components/board";
 import Card from "../components/card";
 import CategoryModal from "../components/categoryModal";
@@ -42,14 +42,12 @@ export default function Categories() {
 
     const handleDelete = async (category: Category) => {
         try {
-            await categoryService.DeleteCategory(category.id)
-                .then(() => { showSuccessToast("Kategori silme başarılı.") })
-                .catch((err) => { showErrorToast(err) });
+            await categoryService.DeleteCategory(category.id);
+            showSuccessToast("Kategori silme başarılı.");
             await fetchCategories();
         } catch (err) {
             let errorMessage = "Kategori silinemedi. Lütfen daha sonra tekrar deneyin.";
 
-            // AxiosError kontrolü
             if (err instanceof AxiosError) {
                 if (err.response?.status === 500) {
                     errorMessage = "Bu kategoriye bağlı mekanlar bulunduğu için silinemez.";
@@ -63,6 +61,7 @@ export default function Categories() {
             showErrorToast(errorMessage);
         }
     };
+
 
     const handleSubmit = async (category: Partial<Category>) => {
         try {
@@ -87,21 +86,24 @@ export default function Categories() {
                         newRecordButtonOnClick={handleAdd}
                         hiddenColumns={["id"]}
                         customElementOfActions={(item) => (
-                            <>
+                            <Stack direction="row" spacing={1} justifyContent="center" alignItems="center">
                                 <Button
                                     variant="contained"
                                     color="success"
-                                    onClick={() => handleEdit(item)}>
+                                    onClick={() => handleEdit(item)}
+                                >
                                     Düzenle
                                 </Button>
                                 <Button
                                     variant="contained"
                                     color="error"
-                                    onClick={() => handleDelete(item)}>
+                                    onClick={() => handleDelete(item)}
+                                >
                                     Sil
                                 </Button>
-                            </>
+                            </Stack>
                         )}
+
                     />
                 </Card>
             </Container>
